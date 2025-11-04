@@ -1,0 +1,32 @@
+# Игнорировать все Excel и CSV файлы
+*.xlsx
+*.xls
+*.csv
+
+# Игнорировать Jupyter Notebook файлы
+*.ipynb
+
+# Игнорировать файлы R
+*.R
+*.r
+*.RData
+*.Rhistory
+
+# Игнорировать документы Word
+*.doc
+*.docx
+
+# Папки CatBoost
+catboost_info/
+
+# IDE и JetBrains
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Windows system files
+Thumbs.db
+Desktop.ini
+
+__pycache__/
