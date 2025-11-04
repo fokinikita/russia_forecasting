@@ -16,6 +16,7 @@ EARLY_STOPPING_ROUNDS: Final[int] = 50
 START_ITERATIONS_NGB: Final[int] = 500
 LEARNING_RATE_NGB: Final[float] = 0.01
 DEPTH_NGB_BASE: Final[int] = 2
+EARLY_STOPPING_ROUNDS_NGB: Final[int] = 25
 
 # features parans
 ROLLING_WINDOWS_MONTH: Final[list[int]] = [3, 6, 12]

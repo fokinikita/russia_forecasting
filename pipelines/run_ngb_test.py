@@ -2,7 +2,7 @@ import polars as pl
 import logging
 
 from preprocess_data.datae2e import DataE2E
-from models.gb import GB
+from models.ngb import NGB
 
 import config
 
@@ -12,7 +12,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def run_main_gb() -> None:
+def run_main_ngb() -> None:
     horizon_grid = range(1, config.HORIZON + 1)
     features_type_grid = ['rolling', 'd12']
     avaliability_grid = range(1, config.MAX_AVALIABILITY + 1)
@@ -20,16 +20,18 @@ def run_main_gb() -> None:
 
     train, valid, train_valid, test, avail_features_full = DataE2E().run()
 
-    gb_pred = []
+    ngb_pred = []
     for features_type in features_type_grid:
         for target in target_grid:
             for horizon in horizon_grid:
                 for avaliability in avaliability_grid:
                     params = {
-                        "iterations": config.START_ITERATIONS,
+                        "n_estimators": config.START_ITERATIONS_NGB,
+                        "learning_rate": config.LEARNING_RATE_NGB,
+                        "verbose": False,
                     }
 
-                    gb = GB(
+                    ngb = NGB(
                         features_type=features_type,
                         avaliability=avaliability,
                         target_name=target,
@@ -38,17 +40,16 @@ def run_main_gb() -> None:
                         params=params,
                     )
 
-                    gb.fit(train, valid, early_stopping=config.EARLY_STOPPING_ROUNDS)
+                    ngb.fit(train, valid, early_stopping=config.EARLY_STOPPING_ROUNDS_NGB)
+                    ngb.fit(train_valid)
 
-                    gb.fit(train_valid)
-
-                    gb_pred.append(gb.predict(test))
+                    ngb_pred.append(ngb.predict(test))
                     logger.info(f"Predict for {target},"
                                 f" horizon {horizon} with avaliability {avaliability} was calculated,"
                                 f" features: {features_type}")
 
-    gb_pred_pl = pl.concat(gb_pred)
-    gb_pred_pl.write_csv('gb_pred_test.csv')
+    ngb_pred_pl = pl.concat(ngb_pred)
+    ngb_pred_pl.write_csv('ngb_pred_test.csv')
 
 if __name__ == "__main__":
-    run_main_gb()
+    run_main_ngb()
