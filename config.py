@@ -4,11 +4,13 @@ from typing import Final
 HORIZON: Final[int] = 6
 VALID_LEN: Final[int] = 12
 TEST_LEN: Final[int] = 12
+MAX_AVALIABILITY: Final[int] = 3
 
 # Catboost params
 RANDOM_SEED: Final[int] = 228
 THREAD_COUNT: Final[int] = 6
 START_ITERATIONS: Final[int] = 1000
+EARLY_STOPPING_ROUNDS: Final[int] = 50
 
 # NGB params
 START_ITERATIONS_NGB: Final[int] = 500

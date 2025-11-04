@@ -96,5 +96,6 @@ class GB:
             pl.lit(self.horizon).alias("horizon"),
             pl.lit(self.avaliability).alias("avaliability"),
             pl.lit(self.target_name).alias('target_name'),
+            pl.lit(self.features_type).alias('features_type'),
         )
         return pred_df
