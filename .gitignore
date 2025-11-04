@@ -1,6 +1,4 @@
 # Игнорировать все Excel и CSV файлы
-*.xlsx
-*.xls
 *.csv
 
 # Игнорировать Jupyter Notebook файлы
@@ -30,3 +28,6 @@ Thumbs.db
 Desktop.ini
 
 __pycache__/
+
+test_parse.xlsx
+giga_data_prep_07_2025.xlsx

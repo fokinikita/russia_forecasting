@@ -23,7 +23,7 @@ START_YEAR: Final[int] = 2001
 #YEARS_DUMMY: Final[list[int]] = [2008, 2015, 2022]
 
 # paths
-GIGA_DATA_PATH: Final[str] = "giga_data_ready_07_2025.xlsx"
-FRED_DATA_PATH: Final[str] = "fred_data.xlsx"
-CBR_DATA_PATH: Final[str] = "cbr_data.xlsx"
-QUARTERLY_DATA_PATH: Final[str] = "quarterly_data.xlsx"
+GIGA_DATA_PATH: Final[str] = "data/giga_data_ready_07_2025.xlsx"
+FRED_DATA_PATH: Final[str] = "data/fred_data.xlsx"
+CBR_DATA_PATH: Final[str] = "data/cbr_data.xlsx"
+QUARTERLY_DATA_PATH: Final[str] = "data/quarterly_data.xlsx"
