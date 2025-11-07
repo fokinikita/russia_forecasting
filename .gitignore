@@ -31,3 +31,8 @@ __pycache__/
 
 test_parse.xlsx
 giga_data_prep_07_2025.xlsx
+
+.pt_tmp/
+DeepGBM/
+GBNN/
+deepgbm_env/

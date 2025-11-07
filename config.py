@@ -18,7 +18,17 @@ LEARNING_RATE_NGB: Final[float] = 0.01
 DEPTH_NGB_BASE: Final[int] = 2
 EARLY_STOPPING_ROUNDS_NGB: Final[int] = 25
 
-# features parans
+# TabNet params
+
+BATCH_SIZE_TABNET: Final[int] = 8
+VIRTUAL_BATCH_SIZE_TABNET: Final[int] = 8
+LEARNING_RATE_TABNET: Final[float] = 0.05
+LAMBDA_SPARSE_TABNET: Final[float] = 0.005
+MASK_TYPE_TABNET: Final[str] = "sparsemax"
+MAX_EPOCHS_TABNET: Final[int] = 200
+EARLY_STOPPING_ROUNDS_TABNET: Final[int] = 20
+
+# features params
 ROLLING_WINDOWS_MONTH: Final[list[int]] = [3, 6, 12]
 
 START_YEAR: Final[int] = 2001
