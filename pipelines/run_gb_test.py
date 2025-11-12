@@ -48,7 +48,7 @@ def run_main_gb() -> None:
                                 f" features: {features_type}")
 
     gb_pred_pl = pl.concat(gb_pred)
-    gb_pred_pl.write_csv('gb_pred_test.csv')
+    gb_pred_pl.write_csv('preds/gb_pred_test.csv')
 
 if __name__ == "__main__":
     run_main_gb()

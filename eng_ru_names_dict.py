@@ -19,7 +19,28 @@ eng_ru_cbr_dict = {
     "ex_usd": "Экспорт товаров (ФОБ), млн долларов",
     "im_usd": "Импорт товаров (ФОБ), млн долларов",
 }
-
+chain_indeces = [
+    "ipi",
+    "ipi_mining",
+    "ipi_manufacturing",
+    "ipi_water_electro_gas",
+    "pi_agriculture",
+    "retail_real",
+    "retail_real_food",
+    "retail_real_nonfood",
+    "market_service_vol_real",
+    "cpi",
+    "cpi_food",
+    "cpi_alchohol",
+    "cpi_nonfood",
+    "cpi_services",
+    "wholesale_real",
+    "ppi_animal_husbandry",
+    "pi_inv",
+    "pi_inv_construction",
+    "pi_freight",
+    "wage_real"
+]
 
 eng_ru_gigadata_dict = {
     "ipi": "Индекс промышленного производства",

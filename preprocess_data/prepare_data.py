@@ -4,7 +4,7 @@ import logging
 
 import config
 
-from eng_ru_names_dict import eng_ru_quarterly_dict
+from eng_ru_names_dict import eng_ru_quarterly_dict, chain_indeces
 from preprocess_data.gigadata_parser import parse_giga_data
 
 logging.basicConfig(
@@ -41,6 +41,7 @@ class FeaturesService:
 
         return (cbr_data_raw, fred_data_raw, quarterly_data_raw)
 
+
     @staticmethod
     def _parse_giga_data() -> pl.DataFrame:
         giga_data_list = parse_giga_data(config.GIGA_DATA_PATH)
@@ -71,6 +72,29 @@ class FeaturesService:
 
         #logger.info(f" Диапазон: {min_date} → {max_date}")
         #logger.info(f"Размер итогового DataFrame: {joined.shape}")
+
+        return giga_data
+
+    @staticmethod
+    def _convert_indeces_to_basics(giga_data: pl.DataFrame, chain_indeces: list) -> pl.DataFrame:
+        giga_data = giga_data.sort('datem')
+
+        for column in chain_indeces:
+            chain_series = giga_data[column]
+            first_non_null = chain_series.drop_nulls()[0]
+
+            base_index = []
+            last_value = None
+            for x in chain_series:
+                if x is None:
+                    base_index.append(None)
+                else:
+                    if last_value is None:
+                        last_value = first_non_null
+                    else:
+                        last_value = last_value * x / 100
+                    base_index.append(last_value)
+            giga_data = giga_data.with_columns(pl.Series(column, base_index))
 
         return giga_data
 
@@ -177,6 +201,7 @@ class FeaturesService:
     def get_features(self) -> tuple[pl.DataFrame, pl.DataFrame]:
         cbr_data_raw, fred_data_raw, quarterly_data_raw = self._read_monthly_data()
         giga_data = self._parse_giga_data()
+        giga_data = self._convert_indeces_to_basics(giga_data, chain_indeces)
         joined_monthly_data = self._join_monhtly_data(giga_data, fred_data_raw, cbr_data_raw)
         monthly_features = self._get_features_monthly(joined_monthly_data)
 

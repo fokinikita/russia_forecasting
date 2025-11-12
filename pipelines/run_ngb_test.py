@@ -49,7 +49,7 @@ def run_main_ngb() -> None:
                                 f" features: {features_type}")
 
     ngb_pred_pl = pl.concat(ngb_pred)
-    ngb_pred_pl.write_csv('ngb_pred_test.csv')
+    ngb_pred_pl.write_csv('preds/ngb_pred_test.csv')
 
 if __name__ == "__main__":
     run_main_ngb()

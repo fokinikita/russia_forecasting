@@ -57,7 +57,7 @@ def run_main_tabnet() -> None:
                     )
 
     tabnet_pred_pl = pl.concat(tabnet_pred)
-    tabnet_pred_pl.write_csv('tabnet_pred_test.csv')
+    tabnet_pred_pl.write_csv('preds/tabnet_pred_test.csv')
 
 if __name__ == "__main__":
     run_main_tabnet()
