@@ -16,7 +16,8 @@ dependencies = [
     "catboost>=1.2",
     "ngboost>=0.5",
     "pytorch-tabnet>=4.1",
-    "attrs (>=25.4.0,<26.0.0)"
+    "attrs (>=25.4.0,<26.0.0)",
+    "fastexcel (==0.14.0)"
 ]
 
 [tool.poetry]
