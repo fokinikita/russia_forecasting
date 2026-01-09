@@ -23,6 +23,9 @@ catboost_info/
 *.ipr
 *.iws
 
+plots/
+retail_roll.xlsx
+
 # Windows system files
 Thumbs.db
 Desktop.ini

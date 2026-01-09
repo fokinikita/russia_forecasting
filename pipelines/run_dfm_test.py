@@ -26,11 +26,11 @@ def run_main_dfm() -> None:
 
     forecasts_steps = range(config.TEST_LEN + config.HORIZON - 1)
 
-    features_type_grid = ['d12', 'rolling']
+    features_type_grid = ['d12']
     features_strategy_grid = ['avail_only', 'all']
     avaliability_grid = range(1, config.MAX_AVALIABILITY + 1)
-    k_factors_grid = [2, 3]
-    factor_order_grid = [1, 2, 3, 4]
+    k_factors_grid = [1, 2, 3]
+    factor_order_grid = [1, 2,]
 
     pred_dfm_list = []
 
