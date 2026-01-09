@@ -57,6 +57,21 @@ giga_data/
 ├── poetry.lock
 └── README.md
 ```
+
+## MFBVAR в R:
+Пакет mfbvar удален из кран, но его архив лежит в репозитории, им можно воспользоваться
+в крайнем случае скачать тут https://cran.r-project.org/src/contrib/Archive/mfbvar/
+mfbvar_0.5.6.tar.gz	2021-02-10 12:00 	593K	 
+и установить через install.packages
+
+Если этот пакет успешно установлен, то можно просто запустить весь скрипт mfbvar.R
+паралелельно с main.py в Python.
+
+Можно не запускать mfbvar, тогда метрики по этой модели рассчитаны не будут,
+но тогда в main.py
+
+run_metrics(run_mfbvar=True) нужно поменять на run_metrics(run_mfbvar=False)
+
 ## Запуск и репликация
 
 Гарантированный реплицированный запуск можно получить через poetry
@@ -66,4 +81,3 @@ poetry run python main.py
 python main.py, но метрики могут отличаться, хотя random seed везде зафиксирован
 
 
-## MFBVAR в R: TODO

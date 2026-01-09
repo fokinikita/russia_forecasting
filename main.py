@@ -9,4 +9,4 @@ if __name__ == "__main__":
     run_main_ngb()
     run_main_tabnet()
     run_main_dfm()
-    run_metrics()
+    run_metrics(run_mfbvar=True)

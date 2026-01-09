@@ -5,8 +5,6 @@
 *.ipynb
 
 # Игнорировать файлы R
-*.R
-*.r
 *.RData
 *.Rhistory
 
