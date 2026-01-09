@@ -1,0 +1,16 @@
+[project]
+name = "russian-forecasting-ml-vs-classic"
+version = "0.1.0"
+description = "Set of ML and classic econometrics models for forecasting main russian macroeconomic variables"
+authors = [
+    {name = "fokinikita",email = "fokinikita@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
