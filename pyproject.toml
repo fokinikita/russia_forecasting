@@ -1,15 +1,25 @@
 [project]
 name = "russian-forecasting-ml-vs-classic"
 version = "0.1.0"
-description = "Set of ML and classic econometrics models for forecasting main russian macroeconomic variables"
+description = "Set of ML and classic econometrics models for forecasting main Russian macroeconomic variables"
 authors = [
-    {name = "fokinikita",email = "fokinikita@gmail.com"}
+    {name = "fokinikita", email = "fokinikita@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.9,<3.13"
 dependencies = [
+    "numpy>=1.23,<2.0",
+    "pandas>=2.0,<3.0",
+    "polars>=0.20",
+    "scikit-learn>=1.3",
+    "statsmodels>=0.14",
+    "catboost>=1.2",
+    "ngboost>=0.5",
+    "pytorch-tabnet>=4.1"
 ]
 
+[tool.poetry]
+package-mode = false  # <- отключаем установку проекта как пакета
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

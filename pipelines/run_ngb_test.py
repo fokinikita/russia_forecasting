@@ -13,7 +13,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-os.makedirs("preds", exis_ok=True)
 def run_main_ngb() -> None:
     horizon_grid = range(1, config.HORIZON + 1)
     features_type_grid = ['rolling', 'd12']
@@ -51,6 +50,7 @@ def run_main_ngb() -> None:
                                 f" features: {features_type}")
 
     ngb_pred_pl = pl.concat(ngb_pred)
+    os.makedirs("preds", exist_ok=True)
     ngb_pred_pl.write_csv('preds/ngb_pred_test.csv')
 
 if __name__ == "__main__":

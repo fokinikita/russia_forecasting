@@ -3,7 +3,6 @@ from preprocess_data.datae2e import DataE2E
 from metrics.metrics import MetricsCalculator
 import os
 
-os.makedirs("preds", exis_ok=True)
 
 def run_metrics() -> None:
     train, valid, train_valid, test, avail_features_full = DataE2E().run()
@@ -25,7 +24,8 @@ def run_metrics() -> None:
     target_names = ['gdp_log_d4', 'cons_log_d4', 'inv_log_d4', 'inv_cap_log_d4']
 
     metrics = MetricsCalculator(preds_list, model_names, target_names, pl.concat([train, valid, test])).get_metrics()
-    matrics.write_csv('preds/metrics.csv')
+    os.makedirs("preds", exist_ok=True)
+    metrics.write_csv('preds/metrics.csv')
 
 if __name__ == '__main__':
     run_metrics()

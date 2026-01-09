@@ -18,8 +18,6 @@ logger = logging.getLogger(__name__)
 
 warnings.filterwarnings("ignore")
 
-os.makedirs("preds", exis_ok=True)
-
 def run_main_dfm() -> None:
     train, valid, train_valid, test, avail_features_full = DataE2E().run()
     features = pl.concat([train, valid, test])
@@ -90,6 +88,7 @@ def run_main_dfm() -> None:
                             logger.info(f"Successfully fitted")
 
     dfm_preds_pl_df = pl.concat(pred_dfm_list)
+    os.makedirs("preds", exist_ok=True)
     dfm_preds_pl_df.write_csv('preds/dfm_pred_test.csv')
 
 if __name__ == "__main__":
