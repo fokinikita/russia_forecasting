@@ -91,3 +91,67 @@ class MetricsCalculator:
         ).with_columns((pl.col("rmse") / pl.col("rmse_naive")).alias("rel_rmse_naive"))
 
         return all_pred
+
+def run_mfbvar_metrics_calculator(test: pl.DataFrame) -> pl.DataFrame:
+    mfbvar_pred_pl = pl.read_csv('preds/mfbvar_pred_test.csv').with_columns(
+        pl.col('fcst_date').cast(pl.Date).alias('date')
+    ).with_columns(
+        (pl.col('date').dt.offset_by("-2mo")).alias('date')
+    ).rename(
+        {
+            'median': 'pred_mfbvar',
+            'variable': 'target_name'
+        }
+    ).drop('fcst_date').drop('p')
+
+    fact_melted = pl.concat(
+        [test.select(['date', target]).rename(
+            {
+                target: 'fact'
+            }
+        ).with_columns(
+            pl.lit(target).alias('target_name')
+        ) for target in target_names
+        ]
+    )
+
+    mfbvar_pred_with_fact = mfbvar_pred_pl.filter(
+        pl.col('date').is_in(test['date'].unique().to_list())
+    ).join(fact_melted, on=['date', 'target_name']).with_columns(
+        ((pl.col('fact') - pl.col('pred_mfbvar')) ** 2).alias('mse')
+    )
+
+    mfbvar_pred_metrics = mfbvar_pred_with_fact.group_by(
+        'horizon',
+        'avaliability',
+        'target_name',
+    ).agg(
+        (pl.col('mse').mean() ** 0.5).alias('rmse')
+    )
+    mfbvar_pred_metrics = mfbvar_pred_metrics.join(
+        metrics_naive, on=['horizon', 'target_name']
+    ).with_columns(
+        (pl.col('rmse') / pl.col('rmse_naive')).alias('rel_rmse_naive')
+    )
+
+    mfbvar_pred_metrics = mfbvar_pred_metrics.sort('avaliability', descending=True).sort('horizon').sort('target_name')
+
+    mfbvar_pred_metrics = mfbvar_pred_metrics.with_columns(
+        pl.lit('mfbvar').alias('model'),
+        pl.lit('d12').alias('features_type'),
+    )
+
+    metrics_mfbvar = mfbvar_pred_metrics.select(
+        [
+            'horizon',
+             'avaliability',
+             'features_type',
+             'rmse',
+             'target_name',
+             'model',
+             'rmse_naive',
+             'rel_rmse_naive'
+        ]
+    )
+
+    return metrics_mfbvar

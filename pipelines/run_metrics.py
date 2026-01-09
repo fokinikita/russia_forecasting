@@ -2,11 +2,11 @@ import os
 
 import polars as pl
 
-from metrics.metrics import MetricsCalculator
+from metrics.metrics import MetricsCalculator, run_mfbvar_metrics_calculator
 from preprocess_data.datae2e import DataE2E
 
 
-def run_metrics() -> None:
+def run_metrics(run_mfbvar: bool = True) -> None:
     train, valid, train_valid, test, avail_features_full = DataE2E().run()
 
     gb_pred_pl = pl.read_csv("preds/gb_pred_test.csv").with_columns(
@@ -28,6 +28,11 @@ def run_metrics() -> None:
     metrics = MetricsCalculator(
         preds_list, model_names, target_names, pl.concat([train, valid, test])
     ).get_metrics()
+
+    if run_mfbvar:
+        mfbvar_metrics = run_mfbvar_metrics_calculator(test)
+        metrices = pl.concat(metrics, mfbvar_metrics)
+
     os.makedirs("preds", exist_ok=True)
     metrics.write_csv("preds/metrics.csv")
 
