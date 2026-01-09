@@ -20,9 +20,9 @@
 - **TabNet**
 
 ### Эконометрические модели
-- **MF-BVAR (Mixed-Frequency Bayesian VAR)**
-- **DFM (Dynamic Factor Model,)**
-- **Наивный бенчмарк** (random walk / last value)
+- **MFBVAR (Mixed-Frequency Bayesian VAR)**
+- **DFM (Dynamic Factor Model)**
+- **Наивный бенчмарк** (random walk / последнее известное значение)
 
 ---
 # Данные
@@ -61,8 +61,8 @@ giga_data/
 ## MFBVAR в R:
 Пакет mfbvar удален из кран, но его архив лежит в репозитории, им можно воспользоваться
 в крайнем случае скачать тут https://cran.r-project.org/src/contrib/Archive/mfbvar/
-mfbvar_0.5.6.tar.gz	2021-02-10 12:00 	593K	 
-и установить через install.packages
+mfbvar_0.5.6.tar.gz	2021-02-10 12:00	 
+и установить через ```install.packages```
 
 Если этот пакет успешно установлен, то можно просто запустить весь скрипт mfbvar.R
 паралелельно с main.py в Python.
@@ -70,12 +70,16 @@ mfbvar_0.5.6.tar.gz	2021-02-10 12:00 	593K
 Можно не запускать mfbvar, тогда метрики по этой модели рассчитаны не будут,
 но тогда в main.py
 
-run_metrics(run_mfbvar=True) нужно поменять на run_metrics(run_mfbvar=False)
+```run_metrics(run_mfbvar=True)``` 
+нужно поменять на
+```run_metrics(run_mfbvar=False)```
 
 ## Запуск и репликация
 
 Гарантированный реплицированный запуск можно получить через poetry
-poetry run python main.py
+
+```poetry run python main.py```
+
 в таком случае будут использоваться одни и те же версии всех библиотек
 можно и просто запустить
 python main.py, но метрики могут отличаться, хотя random seed везде зафиксирован
