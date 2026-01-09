@@ -1,7 +1,7 @@
 import attrs
 import logging
+import os
 import polars as pl
-import pandas as pd
 import warnings
 from statsmodels.tsa.statespace.dynamic_factor import DynamicFactor
 from dateutil.relativedelta import relativedelta
@@ -17,6 +17,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 warnings.filterwarnings("ignore")
+
+os.makedirs("preds", exis_ok=True)
 
 def run_main_dfm() -> None:
     train, valid, train_valid, test, avail_features_full = DataE2E().run()

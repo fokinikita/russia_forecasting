@@ -1,6 +1,9 @@
 import polars as pl
 from preprocess_data.datae2e import DataE2E
 from metrics.metrics import MetricsCalculator
+import os
+
+os.makedirs("preds", exis_ok=True)
 
 def run_metrics() -> None:
     train, valid, train_valid, test, avail_features_full = DataE2E().run()
