@@ -1,24 +1,21 @@
-import os
-import polars as pl
 import logging
+import os
 
-from preprocess_data.datae2e import DataE2E
-from models.gb import GB
+import polars as pl
 
 import config
+from models.gb import GB
+from preprocess_data.datae2e import DataE2E
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(levelname)s] %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
 
 def run_main_gb() -> None:
     horizon_grid = range(1, config.HORIZON + 1)
-    features_type_grid = ['rolling', 'd12']
+    features_type_grid = ["rolling", "d12"]
     avaliability_grid = range(1, config.MAX_AVALIABILITY + 1)
-    target_grid = ['gdp_log_d4', 'cons_log_d4', 'inv_log_d4', 'inv_cap_log_d4']
+    target_grid = ["gdp_log_d4", "cons_log_d4", "inv_log_d4", "inv_cap_log_d4"]
 
     train, valid, train_valid, test, avail_features_full = DataE2E().run()
 
@@ -45,13 +42,16 @@ def run_main_gb() -> None:
                     gb.fit(train_valid)
 
                     gb_pred.append(gb.predict(test))
-                    logger.info(f"Predict for {target},"
-                                f" horizon {horizon} with avaliability {avaliability} was calculated,"
-                                f" features: {features_type}")
+                    logger.info(
+                        f"Predict for {target},"
+                        f" horizon {horizon} with avaliability {avaliability} was calculated,"
+                        f" features: {features_type}"
+                    )
 
     gb_pred_pl = pl.concat(gb_pred)
     os.makedirs("preds", exist_ok=True)
-    gb_pred_pl.write_csv('preds/gb_pred_test.csv')
+    gb_pred_pl.write_csv("preds/gb_pred_test.csv")
+
 
 if __name__ == "__main__":
     run_main_gb()

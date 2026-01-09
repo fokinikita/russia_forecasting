@@ -1,23 +1,21 @@
-import os
-import polars as pl
 import logging
+import os
 
-from preprocess_data.datae2e import DataE2E
-from models.ngb import NGB
+import polars as pl
 
 import config
+from models.ngb import NGB
+from preprocess_data.datae2e import DataE2E
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(levelname)s] %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
+
 
 def run_main_ngb() -> None:
     horizon_grid = range(1, config.HORIZON + 1)
-    features_type_grid = ['rolling', 'd12']
+    features_type_grid = ["rolling", "d12"]
     avaliability_grid = range(1, config.MAX_AVALIABILITY + 1)
-    target_grid = ['gdp_log_d4', 'cons_log_d4', 'inv_log_d4', 'inv_cap_log_d4']
+    target_grid = ["gdp_log_d4", "cons_log_d4", "inv_log_d4", "inv_cap_log_d4"]
 
     train, valid, train_valid, test, avail_features_full = DataE2E().run()
 
@@ -41,17 +39,22 @@ def run_main_ngb() -> None:
                         params=params,
                     )
 
-                    ngb.fit(train, valid, early_stopping=config.EARLY_STOPPING_ROUNDS_NGB)
+                    ngb.fit(
+                        train, valid, early_stopping=config.EARLY_STOPPING_ROUNDS_NGB
+                    )
                     ngb.fit(train_valid)
 
                     ngb_pred.append(ngb.predict(test))
-                    logger.info(f"Predict for {target},"
-                                f" horizon {horizon} with avaliability {avaliability} was calculated,"
-                                f" features: {features_type}")
+                    logger.info(
+                        f"Predict for {target},"
+                        f" horizon {horizon} with avaliability {avaliability} was calculated,"
+                        f" features: {features_type}"
+                    )
 
     ngb_pred_pl = pl.concat(ngb_pred)
     os.makedirs("preds", exist_ok=True)
-    ngb_pred_pl.write_csv('preds/ngb_pred_test.csv')
+    ngb_pred_pl.write_csv("preds/ngb_pred_test.csv")
+
 
 if __name__ == "__main__":
     run_main_ngb()

@@ -1,13 +1,15 @@
+from typing import Any, Dict, Optional
+
 import attrs
 import numpy as np
 import polars as pl
-from typing import Optional, Dict, Any
 from ngboost import NGBoost
 from ngboost.distns import Normal
 from ngboost.scores import CRPS
 from sklearn.tree import DecisionTreeRegressor
 
 import config
+
 
 @attrs.define(slots=True)
 class NGB:
@@ -32,8 +34,10 @@ class NGB:
     def _get_lags_target(target_name: str, horizon: int) -> list[str]:
         return [f"{target_name}_lag{horizon}"]
 
-    def _prepare_numpy(self, df: pl.DataFrame, features_cols: list[str]) -> tuple[np.ndarray, np.ndarray]:
-        df_pd = df.drop('date').to_pandas()
+    def _prepare_numpy(
+        self, df: pl.DataFrame, features_cols: list[str]
+    ) -> tuple[np.ndarray, np.ndarray]:
+        df_pd = df.drop("date").to_pandas()
         X = df_pd[features_cols].astype(np.float32).values
         y = df_pd[self.target_name].astype(np.float32).values
         return X, y
@@ -45,13 +49,10 @@ class NGB:
         early_stopping: Optional[int] = 30,
     ):
 
-        features_cols = (
-            self._get_actual_lags_features(
-                self.avail_features_full[self.features_type][self.avaliability],
-                self.horizon
-            )
-            + self._get_lags_target(self.target_name, self.horizon)
-        )
+        features_cols = self._get_actual_lags_features(
+            self.avail_features_full[self.features_type][self.avaliability],
+            self.horizon,
+        ) + self._get_lags_target(self.target_name, self.horizon)
 
         X_train, y_train = self._prepare_numpy(train, features_cols)
 
@@ -66,13 +67,17 @@ class NGB:
                 ),
                 "Dist": Normal,
                 "Score": CRPS,
-                "n_estimators": self.params.get("n_estimators", config.START_ITERATIONS_NGB),
-                "learning_rate": self.params.get("learning_rate", config.LEARNING_RATE_NGB),
+                "n_estimators": self.params.get(
+                    "n_estimators", config.START_ITERATIONS_NGB
+                ),
+                "learning_rate": self.params.get(
+                    "learning_rate", config.LEARNING_RATE_NGB
+                ),
                 "verbose": self.params.get("verbose", True),
                 "random_state": self.params.get("random_state", config.RANDOM_SEED),
                 "early_stopping_rounds": early_stopping,
                 "validation_fraction": None,
-                "verbose": False
+                "verbose": False,
             }
 
             self.model = NGBoost(**base_params)
@@ -82,7 +87,9 @@ class NGB:
             self.params["n_estimators"] = best_n_estimators
 
         else:
-            best_n_estimators = self.params.get("n_estimators", config.START_ITERATIONS_NGB)
+            best_n_estimators = self.params.get(
+                "n_estimators", config.START_ITERATIONS_NGB
+            )
 
         if valid is not None and not valid.is_empty():
             train_valid = pl.concat([train, valid])
@@ -110,13 +117,10 @@ class NGB:
 
     def predict(self, test: pl.DataFrame) -> pl.DataFrame:
 
-        features_cols = (
-            self._get_actual_lags_features(
-                self.avail_features_full[self.features_type][self.avaliability],
-                self.horizon
-            )
-            + self._get_lags_target(self.target_name, self.horizon)
-        )
+        features_cols = self._get_actual_lags_features(
+            self.avail_features_full[self.features_type][self.avaliability],
+            self.horizon,
+        ) + self._get_lags_target(self.target_name, self.horizon)
 
         X_test, _ = self._prepare_numpy(test, features_cols)
         preds = self.model.predict(X_test)
@@ -126,7 +130,7 @@ class NGB:
             pl.lit(self.horizon).alias("horizon"),
             pl.lit(self.avaliability).alias("avaliability"),
             pl.lit(self.target_name).alias("target_name"),
-            pl.lit(self.features_type).alias('features_type'),
+            pl.lit(self.features_type).alias("features_type"),
         )
 
         return pred_df

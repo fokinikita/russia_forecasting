@@ -1,9 +1,11 @@
+from typing import Optional
+
 import attrs
 import polars as pl
 from catboost import CatBoostRegressor, Pool
 
-from typing import Optional
 import config
+
 
 @attrs.define(slots=True)
 class GB:
@@ -31,23 +33,22 @@ class GB:
 
     @staticmethod
     def _get_lags_target(target_name, horizon: int) -> list[str]:
-        target_lags = target_name + f'_lag{horizon}'
+        target_lags = target_name + f"_lag{horizon}"
 
         return [target_lags]
 
-
     def fit(
-            self,
-            train: pl.DataFrame,
-            valid: Optional[pl.DataFrame] = None,
-            early_stopping: Optional[int] = None
+        self,
+        train: pl.DataFrame,
+        valid: Optional[pl.DataFrame] = None,
+        early_stopping: Optional[int] = None,
     ):
 
         base_params = {
             "random_seed": config.RANDOM_SEED,
             "loss_function": "RMSE",
             "verbose": False,
-            "thread_count": config.THREAD_COUNT
+            "thread_count": config.THREAD_COUNT,
         }
 
         if self.params:
@@ -55,7 +56,7 @@ class GB:
 
         features_cols = self._get_actual_lags_features(
             self.avail_features_full[self.features_type][self.avaliability],
-            self.horizon
+            self.horizon,
         ) + self._get_lags_target(self.target_name, self.horizon)
 
         target_col = self.target_name
@@ -72,11 +73,16 @@ class GB:
             )
 
             base_params["early_stopping_rounds"] = early_stopping
-            self.model = CatBoostRegressor(**base_params, eval_metric=base_params["loss_function"])
+            self.model = CatBoostRegressor(
+                **base_params, eval_metric=base_params["loss_function"]
+            )
             self.model.fit(train_pool, eval_set=valid_pool)
 
         else:
-            if hasattr(self.model, "best_iteration_") and self.model.best_iteration_ is not None:
+            if (
+                hasattr(self.model, "best_iteration_")
+                and self.model.best_iteration_ is not None
+            ):
                 base_params["iterations"] = self.model.best_iteration_ + 1
 
             self.model = CatBoostRegressor(**base_params)
@@ -86,16 +92,16 @@ class GB:
 
         features_cols = self._get_actual_lags_features(
             self.avail_features_full[self.features_type][self.avaliability],
-            self.horizon
+            self.horizon,
         ) + self._get_lags_target(self.target_name, self.horizon)
 
         test_pool = Pool(data=test.select(features_cols).to_pandas())
 
-        pred_df = test.select('date').with_columns(
-            pl.lit(self.model.predict(test_pool)).alias('pred_gb'),
+        pred_df = test.select("date").with_columns(
+            pl.lit(self.model.predict(test_pool)).alias("pred_gb"),
             pl.lit(self.horizon).alias("horizon"),
             pl.lit(self.avaliability).alias("avaliability"),
-            pl.lit(self.target_name).alias('target_name'),
-            pl.lit(self.features_type).alias('features_type'),
+            pl.lit(self.target_name).alias("target_name"),
+            pl.lit(self.features_type).alias("features_type"),
         )
         return pred_df

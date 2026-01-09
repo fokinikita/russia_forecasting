@@ -5,7 +5,7 @@ eng_ru_quarterly_dict = {
     "inv_cap": "Инвестиции в основной капитал",
 }
 
-eng_ru_fred_dict  = {
+eng_ru_fred_dict = {
     "brent": "Цена на нефть марки Brent (долл./барр.)",
     "neer": "Номинальный эффективный обменный курс рубля",
     "reer": "Реальный эффективный обменный курс рубля",
@@ -39,7 +39,7 @@ chain_indeces = [
     "pi_inv",
     "pi_inv_construction",
     "pi_freight",
-    "wage_real"
+    "wage_real",
 ]
 
 eng_ru_gigadata_dict = {

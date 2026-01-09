@@ -1,10 +1,11 @@
 import attrs
 import polars as pl
 
-from preprocess_data.prepare_data import FeaturesService
-from preprocess_data.montlhy_to_quarterly import MonthlyToQuarterlyService
-from preprocess_data.splitter_service import TrainValTestSplit
 from preprocess_data.lags_service import LagsService
+from preprocess_data.montlhy_to_quarterly import MonthlyToQuarterlyService
+from preprocess_data.prepare_data import FeaturesService
+from preprocess_data.splitter_service import TrainValTestSplit
+
 
 @attrs.define(slots=True)
 class DataE2E:
@@ -30,10 +31,4 @@ class DataE2E:
         train, valid, test = splitter_service.split()
         train_valid = pl.concat([train, valid])
 
-        return (
-            train,
-            valid,
-            train_valid,
-            test,
-            avail_features_full
-        )
+        return (train, valid, train_valid, test, avail_features_full)

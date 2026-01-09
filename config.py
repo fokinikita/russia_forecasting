@@ -33,7 +33,7 @@ ROLLING_WINDOWS_MONTH: Final[list[int]] = [3, 6, 12]
 
 START_YEAR: Final[int] = 2001
 
-#YEARS_DUMMY: Final[list[int]] = [2008, 2015, 2022]
+# YEARS_DUMMY: Final[list[int]] = [2008, 2015, 2022]
 
 # paths
 GIGA_DATA_PATH: Final[str] = "data/giga_data_ready_07_2025.xlsx"
