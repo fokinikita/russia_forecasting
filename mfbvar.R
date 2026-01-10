@@ -159,39 +159,3 @@ for (avaliability in seq(1, MAX_AVAILABILITY)) {
 final_results <- rbindlist(all_results, use.names = TRUE)
 
 fwrite(final_results, "preds/mfbvar_pred_test.csv")
-
-
-avaliability <- 1
-test_point <- 1
-
-train_q <- dataq[1:(nrow(dataq) - test_point - 1), ]
-train_m <- datam[1:(nrow(datam) - test_point*3), ]
-
-# Подготовка data_list
-data_list <- list()
-for(j in colnames(datam)) {
-  if(j != "date") data_list[[j]] <- ts(na.omit(train_m[,j]), start = c(START_YEAR,1), frequency = 12)
-}
-data_list[['gdp_log_d4']] <- ts(train_q['gdp_log_d4'], start=c(START_YEAR,1), frequency=4)
-# ... добавь остальные цели
-
-# Попробовать запустить prior и модель
-prior <- set_prior(
-  Y = data_list,
-  n_lags = p,
-  n_fcst = MAX_HORIZON,
-  n_reps = n_reps,
-  prior_Pi_AR1 = prior_Pi_AR1,
-  lambda1 = lambda1,
-  lambda2 = lambda2,
-  lambda3 = lambda3,
-  lambda4 = lambda4,
-  aggregation = "average",
-  check_roots = TRUE
-)
-
-model <- estimate_mfbvar(prior, prior="minn", variance="iw")
-forecasts <- predict(model, aggregate_fcst=TRUE, pred_bands=gamma)
-
-
-?mfbvar::set_prior()
