@@ -2,11 +2,11 @@ import os
 
 import polars as pl
 
-from metrics.metrics import MetricsCalculator, run_mfbvar_metrics_calculator
+from metrics.metrics import MetricsCalculator
 from preprocess_data.datae2e import DataE2E
 
 
-def run_metrics(run_mfbvar: bool = True) -> None:
+def run_metrics(calculate_mfbvar: bool = True, calculate_dfm: bool = True) -> None:
     train, valid, train_valid, test, avail_features_full = DataE2E().run()
 
     gb_pred_pl = pl.read_csv("preds/gb_pred_test.csv").with_columns(
@@ -22,16 +22,12 @@ def run_metrics(run_mfbvar: bool = True) -> None:
     )
 
     preds_list = [gb_pred_pl, ngb_pred_pl, tabnet_pred_pl]
-    model_names = ["gb", "ngb", "tabnet"]
+    ml_model_names = ["gb", "ngb", "tabnet"]
     target_names = ["gdp_log_d4", "cons_log_d4", "inv_log_d4", "inv_cap_log_d4"]
 
     metrics = MetricsCalculator(
-        preds_list, model_names, target_names, pl.concat([train, valid, test])
-    ).get_metrics()
-
-    if run_mfbvar:
-        mfbvar_metrics = run_mfbvar_metrics_calculator(test)
-        metrices = pl.concat(metrics, mfbvar_metrics)
+        preds_list, ml_model_names, target_names, pl.concat([train, valid, test])
+    ).get_metrics(calculate_mfbvar, calculate_dfm)
 
     os.makedirs("preds", exist_ok=True)
     metrics.write_csv("preds/metrics.csv")

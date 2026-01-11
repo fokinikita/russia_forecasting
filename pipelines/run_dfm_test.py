@@ -28,11 +28,8 @@ def run_main_dfm() -> None:
     features_type_grid = ["d12"]
     features_strategy_grid = ["avail_only", "all"]
     avaliability_grid = range(1, config.MAX_AVALIABILITY + 1)
-    k_factors_grid = [1, 2, 3]
-    factor_order_grid = [
-        1,
-        2,
-    ]
+    k_factors_grid = config.K_FACTORS_GRID
+    factor_order_grid = config.FACTOR_ORDER_GRID
 
     pred_dfm_list = []
 
