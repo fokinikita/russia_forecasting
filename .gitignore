@@ -1,8 +1,11 @@
 # Игнорировать все Excel и CSV файлы
 *.csv
+!preds/
+!preds/*.csv
 
 # Игнорировать Jupyter Notebook файлы
 *.ipynb
+!metrics.ipynb
 
 # Игнорировать файлы R
 *.RData
