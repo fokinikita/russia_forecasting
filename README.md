@@ -1,4 +1,4 @@
-# Russian Forecasting: ML vs Classic Models
+# Russian Forecasting: ML vs Classic Econometrics Models
 
 Проект посвящён сравнению **ML-моделей** и **классических эконометрических подходов**
 для прогнозирования основных **макроэкономических показателей России**.
