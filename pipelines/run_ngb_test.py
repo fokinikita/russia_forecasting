@@ -12,6 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 def run_main_ngb() -> None:
+    logger.info("Start fitting NGB models")
+
     horizon_grid = range(1, config.HORIZON + 1)
     features_type_grid = ["rolling", "d12"]
     avaliability_grid = range(1, config.MAX_AVALIABILITY + 1)
@@ -54,6 +56,8 @@ def run_main_ngb() -> None:
     ngb_pred_pl = pl.concat(ngb_pred)
     os.makedirs("preds", exist_ok=True)
     ngb_pred_pl.write_csv("preds/ngb_pred_test.csv")
+
+    logger.info("All NGB models was fitted, prediction saved")
 
 
 if __name__ == "__main__":

@@ -18,6 +18,8 @@ warnings.filterwarnings("ignore")
 
 
 def run_main_dfm() -> None:
+    logger.info("Start fitting DFM models")
+
     train, valid, train_valid, test, avail_features_full = DataE2E().run()
     features = pl.concat([train, valid, test])
 
@@ -93,6 +95,8 @@ def run_main_dfm() -> None:
     dfm_preds_pl_df = pl.concat(pred_dfm_list)
     os.makedirs("preds", exist_ok=True)
     dfm_preds_pl_df.write_csv("preds/dfm_pred_test.csv")
+
+    logger.info("All DFM models was fitted, prediction saved")
 
 
 if __name__ == "__main__":

@@ -7,6 +7,13 @@ from preprocess_data.datae2e import DataE2E
 
 
 def run_metrics(calculate_mfbvar: bool = True, calculate_dfm: bool = True) -> None:
+    logger.info("Start calculating metrics")
+
+    if calculate_mfbvar:
+        logger.info("MFBVAR metrics calculation will be performed too")
+    if calculate_dfm:
+        logger.info("DFM metrics calculation will be performed too")
+
     train, valid, train_valid, test, avail_features_full = DataE2E().run()
 
     gb_pred_pl = pl.read_csv("preds/gb_pred_test.csv").with_columns(
@@ -31,6 +38,8 @@ def run_metrics(calculate_mfbvar: bool = True, calculate_dfm: bool = True) -> No
 
     os.makedirs("preds", exist_ok=True)
     metrics.write_csv("preds/metrics.csv")
+
+    logger.info("All metrics was calculated")
 
 
 if __name__ == "__main__":
