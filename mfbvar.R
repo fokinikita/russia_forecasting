@@ -32,7 +32,7 @@ n_reps = 500
 
 MAX_AVAILABILITY = 3
 HORIZON = 6
-MAX_HORIZON = 24
+MAX_HORIZON = 18
 
 gamma= 0.68
 alpha = 1 - gamma
@@ -66,7 +66,7 @@ datam <- datam %>% filter(date <= last_month_of_quarter)
 all_results <- list()
 
 for (avaliability in seq(1, MAX_AVAILABILITY)) {
-  for (test_point in seq(1, TEST_LEN + HORIZON)) {
+  for (test_point in seq(0, TEST_LEN + HORIZON)) {
 
     message(sprintf("Evaluating model: availability=%d, test_point=%d",
                     avaliability, test_point))
