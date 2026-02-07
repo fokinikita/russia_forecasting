@@ -31,8 +31,8 @@ p = 3
 n_reps = 500
 
 MAX_AVAILABILITY = 3
-HORIZON = 6
-MAX_HORIZON = 18
+HORIZON = 7
+MAX_HORIZON = 24
 
 gamma= 0.68
 alpha = 1 - gamma
