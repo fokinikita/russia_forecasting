@@ -24,12 +24,19 @@
 # Установка
 Чтобы установить себе проект на компьютер: создайте пустую папку и выполните в терминале (находясяь в созданной папке)
 ```git clone https://github.com/fokinikita/russia_forecasting```
+
 ```cd russia_forecasting```
+
 ```poetry config virtualenvs.in-project true```
+
 ```poetry env use python```
+
 ```poetry install```
+
 Это позволит запускать скрипты через poetry
+
 ```poetry run python main.py```
+
 В случае проблем с poetry, всегда можно вызывать их через питон, или ```main.py``` в ноутбук и выполнить ячейку целиком
 
 ---
