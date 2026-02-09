@@ -1,10 +1,12 @@
 import os
-
+import logging
 import polars as pl
 
 from metrics.metrics import MetricsCalculator
 from preprocess_data.datae2e import DataE2E
 
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
+logger = logging.getLogger(__name__)
 
 def run_metrics(calculate_mfbvar: bool = True, calculate_dfm: bool = True) -> None:
     logger.info("Start calculating metrics")
