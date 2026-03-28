@@ -20,7 +20,7 @@ setwd(cd)
 # because the mfbvar package was deleted from CRAN
 # we are installing archive, you can found it in the repo mfbvar_0.5.6.tar.gz
 # Author's Github: https://github.com/ankargren/mfbvar
-#install.packages("mfbvar_0.5.4.tar.gz", repos = NULL, type = "source")
+#install.packages("mfbvar_0.5.6.tar.gz", repos = NULL, type = "source")
 
 library(mfbvar)
 # Then just run all the code below, to get forecasts for further metrics calculations
