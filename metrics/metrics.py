@@ -14,6 +14,7 @@ class MetricsCalculator:
     model_names: list[str]
     target_names: list[str]
     features: Optional[pl.DataFrame] = None
+    folder: str = "preds"
 
     def _concat_ml_models_metrics(self):
 
@@ -85,7 +86,7 @@ class MetricsCalculator:
 
     def _calculate_mfbvar_metrics(self) -> pl.DataFrame:
         mfbvar_pred_pl = (
-            pl.read_csv("preds/mfbvar_pred_test.csv")
+            pl.read_csv(f"{self.folder}/mfbvar_pred_test.csv")
             .with_columns(pl.col("fcst_date").cast(pl.Date).alias("date"))
             .with_columns((pl.col("date").dt.offset_by("-2mo")).alias("date"))
             .rename({"median": "pred_mfbvar", "variable": "target_name"})
@@ -149,7 +150,7 @@ class MetricsCalculator:
         return metrics_mfbvar
 
     def _calculate_dfm_metrics(self) -> pl.DataFrame:
-        dfm_pred_pl = pl.read_csv("preds/dfm_pred_test.csv").with_columns(
+        dfm_pred_pl = pl.read_csv(f"{self.folder}/dfm_pred_test.csv").with_columns(
             pl.col("date").cast(pl.Date)
         )
 
