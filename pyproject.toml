@@ -3,10 +3,10 @@ name = "russian-forecasting-ml-vs-classic"
 version = "0.1.0"
 description = "Set of ML and classic econometrics models for forecasting main Russian macroeconomic variables"
 authors = [
-    {name = "fokinikita", email = "fokinikita@gmail.com"}
+    {name = "Nikita Fokin", email = "fokinikita@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.9,<3.13"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "numpy>=1.23,<2.0",
     "pandas>=2.0,<3.0",
@@ -18,11 +18,12 @@ dependencies = [
     "pytorch-tabnet>=4.1",
     "attrs (>=25.4.0,<26.0.0)",
     "fastexcel (==0.14.0)",
-    "openpyxl (>=3.1.5,<4.0.0)"
+    "openpyxl (>=3.1.5,<4.0.0)",
+    "ipykernel (>=7.2.0,<8.0.0)"
 ]
 
 [tool.poetry]
-package-mode = false  # <- отключаем установку проекта как пакета
+package-mode = false
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
