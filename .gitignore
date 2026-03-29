@@ -1,6 +1,12 @@
 # Игнорировать все Excel и CSV файлы
 *.csv
 
+# Разрешить CSV в preds
+!preds/*.csv
+
+# Разрешить CSV в preds_len24
+!preds_len24/*.csv
+
 # Игнорировать Jupyter Notebook файлы
 *.ipynb
 !metrics.ipynb
