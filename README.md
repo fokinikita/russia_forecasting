@@ -20,14 +20,14 @@ datasets**.
 
 ### Machine Learning
 
--   CatBoost\
--   NGBoost\
+-   CatBoost
+-   NGBoost
 -   TabNet
 
 ### Econometric Models
 
--   MFBVAR (Mixed-Frequency Bayesian VAR)\
--   DFM (Dynamic Factor Model)\
+-   MFBVAR (Mixed-Frequency Bayesian VAR)
+-   DFM (Dynamic Factor Model)
 -   Naive benchmark (random walk / last observed value)
 
 ------------------------------------------------------------------------
@@ -54,7 +54,7 @@ Run the project:
 # Data
 
 All feature variables (**63 variables**) are described in
-`var_naming.xlsx`.
+`var_naming.xlsx`. (in Russian)
 
 To download raw data:
 
