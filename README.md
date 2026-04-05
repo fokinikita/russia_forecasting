@@ -39,15 +39,15 @@ following commands:
 
 > Requires Python 3.12
 
-    ```git clone https://github.com/fokinikita/russia_forecasting```
-    ```cd russia_forecasting```
-    ```poetry config virtualenvs.in-project true```
-    ```poetry env use 3.12```
-    ```poetry install```
+    git clone https://github.com/fokinikita/russia_forecasting
+    cd russia_forecasting
+    poetry config virtualenvs.in-project true
+    poetry env use 3.12
+    poetry install
 
 Run the project:
 
-   ```poetry run python main.py```
+   poetry run python main.py```
 
 ------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ All feature variables (**63 variables**) are described in
 
 To download raw data:
 
-    ```poetry run python -m pipelines.download_prepared_raw_data```
+    poetry run python -m pipelines.download_prepared_raw_data
 
 ------------------------------------------------------------------------
 
