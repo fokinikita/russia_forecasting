@@ -64,9 +64,9 @@ To download raw data:
 
 ## Target Variables
 
-1.  GDP\
-2.  Household consumption\
-3.  Gross capital formation\
+1.  GDP
+2.  Household consumption
+3.  Gross capital formation
 4.  Gross fixed capital formation
 
 ------------------------------------------------------------------------
