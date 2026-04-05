@@ -88,14 +88,89 @@ To download raw data:
 
 ## MFBVAR in R
 
-Download: https://cran.r-project.org/src/contrib/Archive/mfbvar/
+The `mfbvar` package has been removed from CRAN, but its archive is
+included in the repository.
+Alternatively, you can download it here:
+https://cran.r-project.org/src/contrib/Archive/mfbvar/
 
-Install:
+File: mfbvar_0.5.6.tar.gz
 
-    install.packages("path_to_tar.gz", repos = NULL, type = "source")
+Install via:
+
+install.packages("path_to_tar.gz", repos = NULL, type = "source")
+
+If the package is successfully installed, you can run the entire
+`mfbvar.R` script
+in parallel with `main.py` in Python.
+
+You can also skip running MFBVAR. In that case, metrics for this model
+will not be calculated.
+Then in `main.py`, change:
+
+run_metrics(calculate_mfbvar=True)
+
+to:
+
+run_metrics(calculate_mfbvar=False)
 
 ------------------------------------------------------------------------
 
-# Running
+# Running & Reproducibility
 
-    poetry run python main.py
+## Option 1 --- Precomputed forecasts
+
+Simply evaluate metrics using precomputed forecasts stored in the
+`preds` folder.
+
+Use the notebook:
+
+metrics.ipynb
+
+------------------------------------------------------------------------
+
+## Option 2 --- Full reproducible run
+
+A fully reproducible run (training all models locally) can be done via
+Poetry:
+
+poetry run python main.py
+
+This ensures consistent versions of all libraries.
+
+You can also run:
+
+python main.py
+
+but results may differ slightly due to library versions, even though `random_seed` is fixed everywhere.
+
+------------------------------------------------------------------------
+
+## Option 3 --- Notebook
+
+Use the notebook:
+
+metrics.ipynb
+
+It includes: - evaluation metrics
+- test sets of length 12 and 24
+- precomputed forecasts committed to the repository in `.csv` format
+
+------------------------------------------------------------------------
+
+## Notebook Environment Setup
+
+It is recommended to use a separate environment via Poetry.
+
+Install kernel:
+
+poetry add ipykernel
+
+poetry run python -m ipykernel install --user --name=russia_forecasting
+--display-name "Python (russia_forecasting)"
+
+poetry run jupyter notebook
+
+Then open `metrics.ipynb` and select the kernel:
+
+Python (russia_forecasting)
+
