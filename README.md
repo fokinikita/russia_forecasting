@@ -1,138 +1,101 @@
-# Russian Forecasting: ML vs Classic Econometrics Models
+# Russian Forecasting: ML vs Classical Econometric Models
 
-Проект посвящён сравнению **ML-моделей** и **классических эконометрических подходов**
-для прогнозирования основных **макроэкономических показателей России**.
+This project is dedicated to comparing **machine learning models** and
+**classical econometric approaches** for forecasting key **macroeconomic
+indicators of Russia**.
 
----
+------------------------------------------------------------------------
 
-## Планы
-В будущем планируется автоматический парсер всех данных и построение прогнозов на основе моделей на 1.5-2 года вперед,
-пока все работает на вручную собранных таблицах 
+## Plans
 
-## Используемые модели
+In the future, the project will include an automated data parser and
+forecasting pipeline with prediction horizons of **1.5--2 years
+ahead**.\
+Currently, all computations are based on **manually collected
+datasets**.
+
+------------------------------------------------------------------------
+
+## Models Used
 
 ### Machine Learning
-- **CatBoost**
-- **NGBoost**
-- **TabNet**
 
-### Эконометрические модели
-- **MFBVAR (Mixed-Frequency Bayesian VAR)**
-- **DFM (Dynamic Factor Model)**
-- **Наивный бенчмарк** (random walk / последнее известное значение)
+-   CatBoost\
+-   NGBoost\
+-   TabNet
 
-# Установка
-Чтобы установить себе проект на компьютер: создайте пустую папку и выполните в терминале (находясь в созданной папке)
-понадобится Python 3.12
+### Econometric Models
 
-```git clone https://github.com/fokinikita/russia_forecasting```
+-   MFBVAR (Mixed-Frequency Bayesian VAR)\
+-   DFM (Dynamic Factor Model)\
+-   Naive benchmark (random walk / last observed value)
 
-```cd russia_forecasting```
+------------------------------------------------------------------------
 
-```poetry config virtualenvs.in-project true```
+# Installation
 
-```poetry env use 3.12```
+To install the project locally, create an empty directory and run the
+following commands:
 
-```poetry install```
+> Requires Python 3.12
 
-Это позволит запускать скрипты через poetry
+    git clone https://github.com/fokinikita/russia_forecasting
+    cd russia_forecasting
+    poetry config virtualenvs.in-project true
+    poetry env use 3.12
+    poetry install
 
-```poetry run python main.py```
+Run the project:
 
-В случае проблем с poetry, всегда можно вызывать их через питон, или ```main.py``` в ноутбук и выполнить ячейку целиком
+    poetry run python main.py
 
----
-# Данные
+------------------------------------------------------------------------
 
-Все переменные-фичи (63 переменных) можно найти в var_naming.xlsx с обозначениями на английском и источниками
+# Data
 
-Если вы хотите получить их в сыром видете, выполните ```poetry run python -m pipelines.download_prepared_raw_data```
-в папке проекта появится папка `prepared_raw_data`, в которой будет два csv файла (квартальные и месячные данные)
+All feature variables (**63 variables**) are described in
+`var_naming.xlsx`.
 
-## Прогнозируемые показатели
+To download raw data:
 
-- Основные макроэкономические переменные РФ  (в постоянных ценах)
-  1) ВВП,  
-  2) потребление домашних хозяйств
-  3) валовое накопление
-  4) валовое накопление основного капитала
+    poetry run python -m pipelines.download_prepared_raw_data
 
-> Все данные уже находятся в проекте,
-> 
-> пути можно найти в config.py
-> 
-> при необходимости можно поменять, но без изменения все должно запуститься из коробки
+------------------------------------------------------------------------
 
----
+## Target Variables
 
-## Структура проекта
+1.  GDP\
+2.  Household consumption\
+3.  Gross capital formation\
+4.  Gross fixed capital formation
 
-```text
-giga_data/
-├── main.py                  # Точка входа
-├── pipelines/               # Отдельные классы для всех моделей
-├── data/                    # Данные (excel таблицы)
-├── models/                  # Реализации моделей (все кроме mfbvar, так как она реализована в R, о ней ниже)
-├── metrics/                 # Класс для расчетов метрик качества прогнозов
-├── config.py                # файл с настройками моделей/путей и так далее
-├── pyproject.toml
-├── poetry.lock
-└── README.md
-```
+------------------------------------------------------------------------
 
-## MFBVAR в R:
-Пакет mfbvar удален из кран, но его архив лежит в репозитории, им можно воспользоваться
-в крайнем случае скачать тут https://cran.r-project.org/src/contrib/Archive/mfbvar/
-mfbvar_0.5.6.tar.gz	2021-02-10 12:00	 
-и установить через ```install.packages```
+## Project Structure
 
-Если этот пакет успешно установлен, то можно просто запустить весь скрипт mfbvar.R
-паралелельно с ```main.py``` в Python.
+    giga_data/
+    ├── main.py
+    ├── pipelines/
+    ├── data/
+    ├── models/
+    ├── metrics/
+    ├── config.py
+    ├── pyproject.toml
+    ├── poetry.lock
+    └── README.md
 
-Можно не запускать mfbvar, тогда метрики по этой модели рассчитаны не будут,
-но тогда в ```main.py```
+------------------------------------------------------------------------
 
-```run_metrics(calculate_mfbvar=True)``` 
-нужно поменять на
-```run_metrics(calculate_mfbvar=False)```
+## MFBVAR in R
 
-# Запуск и репликация
-## Первый вариант
-Просто посчитать метрики на готовых прогнозах, которые лежит в папке ```preds```
+Download: https://cran.r-project.org/src/contrib/Archive/mfbvar/
 
-Для этого можно использовать ноутбук ```metrics.ipynb``` в корне проекта
+Install:
 
-## Второй вариант
-Гарантированный реплицированный запуск (с расчетом всех моделей на вашей машине) можно получить через poetry
-Выше была инструкция установки через poetry
-```poetry run python main.py```
+    install.packages("path_to_tar.gz", repos = NULL, type = "source")
 
-в таком случае будут использоваться одни и те же версии всех библиотек
-можно и просто запустить
-```python main.py```, но метрики могут отличаться из-за версий библиотек, хотя random_seed везде зафиксирован
+------------------------------------------------------------------------
 
-## Третий вариант  
-Использовать ноутбук `metrics.ipynb`.  
-В нём можно посмотреть все метрики для тестовых выборок длины 12 и 24.  
-Прогнозы для этих выборок уже закоммичены в репозиторий в формате `.csv`.
+# Running
 
----
-
-### Настройка окружения для ноутбука
-
-Рекомендуется использовать отдельное окружение через Poetry.
-
-Установите kernel:
-
-```
-poetry add ipykernel
-```
-
-```
-poetry run python -m ipykernel install --user --name=russia_forecasting --display-name "Python (russia_forecasting)"
-```
-
-```
-poetry run jupyter notebook
-```
-Затем откройте ```metrics.ipynb``` и выберите kernel: ```Python (russia_forecasting)```
+    poetry run python main.py
