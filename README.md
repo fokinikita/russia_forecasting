@@ -39,15 +39,15 @@ following commands:
 
 > Requires Python 3.12
 
-    git clone https://github.com/fokinikita/russia_forecasting
-    cd russia_forecasting
-    poetry config virtualenvs.in-project true
-    poetry env use 3.12
-    poetry install
+    ```git clone https://github.com/fokinikita/russia_forecasting```
+    ```cd russia_forecasting```
+    ```poetry config virtualenvs.in-project true```
+    ```poetry env use 3.12```
+    ```poetry install```
 
 Run the project:
 
-    poetry run python main.py
+   ```poetry run python main.py```
 
 ------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ All feature variables (**63 variables**) are described in
 
 To download raw data:
 
-    poetry run python -m pipelines.download_prepared_raw_data
+    ```poetry run python -m pipelines.download_prepared_raw_data```
 
 ------------------------------------------------------------------------
 
@@ -97,7 +97,7 @@ File: mfbvar_0.5.6.tar.gz
 
 Install via:
 
-install.packages("path_to_tar.gz", repos = NULL, type = "source")
+```install.packages("path_to_tar.gz", repos = NULL, type = "source")```
 
 If the package is successfully installed, you can run the entire
 `mfbvar.R` script
@@ -107,11 +107,11 @@ You can also skip running MFBVAR. In that case, metrics for this model
 will not be calculated.
 Then in `main.py`, change:
 
-run_metrics(calculate_mfbvar=True)
+```run_metrics(calculate_mfbvar=True)```
 
 to:
 
-run_metrics(calculate_mfbvar=False)
+```run_metrics(calculate_mfbvar=False)```
 
 ------------------------------------------------------------------------
 
@@ -124,7 +124,7 @@ Simply evaluate metrics using precomputed forecasts stored in the
 
 Use the notebook:
 
-metrics.ipynb
+```metrics.ipynb```
 
 ------------------------------------------------------------------------
 
@@ -133,13 +133,13 @@ metrics.ipynb
 A fully reproducible run (training all models locally) can be done via
 Poetry:
 
-poetry run python main.py
+```poetry run python main.py```
 
 This ensures consistent versions of all libraries.
 
 You can also run:
 
-python main.py
+```python main.py```
 
 but results may differ slightly due to library versions, even though `random_seed` is fixed everywhere.
 
@@ -149,7 +149,7 @@ but results may differ slightly due to library versions, even though `random_see
 
 Use the notebook:
 
-metrics.ipynb
+```metrics.ipynb```
 
 It includes: - evaluation metrics
 - test sets of length 12 and 24
@@ -163,14 +163,14 @@ It is recommended to use a separate environment via Poetry.
 
 Install kernel:
 
-poetry add ipykernel
+```poetry add ipykernel```
 
-poetry run python -m ipykernel install --user --name=russia_forecasting
---display-name "Python (russia_forecasting)"
+```poetry run python -m ipykernel install --user --name=russia_forecasting
+--display-name "Python (russia_forecasting)"```
 
-poetry run jupyter notebook
+```poetry run jupyter notebook```
 
 Then open `metrics.ipynb` and select the kernel:
 
-Python (russia_forecasting)
+```Python (russia_forecasting)```
 
