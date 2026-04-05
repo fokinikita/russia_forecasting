@@ -165,8 +165,7 @@ Install kernel:
 
 ```poetry add ipykernel```
 
-```poetry run python -m ipykernel install --user --name=russia_forecasting
---display-name "Python (russia_forecasting)"```
+```poetry run python -m ipykernel install --user --name=russia_forecasting --display-name "Python (russia_forecasting)"```
 
 ```poetry run jupyter notebook```
 
