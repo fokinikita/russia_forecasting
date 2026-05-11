@@ -47,7 +47,7 @@ following commands:
 
 Run the project:
 
-   poetry run python main.py```
+   ```poetry run python main.py```
 
 ------------------------------------------------------------------------
 
