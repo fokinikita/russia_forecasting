@@ -18,7 +18,9 @@ dependencies = [
     "pytorch-tabnet>=4.1",
     "attrs (>=25.4.0,<26.0.0)",
     "fastexcel (==0.14.0)",
-    "openpyxl (>=3.1.5,<4.0.0)"
+    "openpyxl (>=3.1.5,<4.0.0)",
+    "requests (>=2.31)",
+    "matplotlib (>=3.8)"
 ]
 
 [tool.poetry]

@@ -1,0 +1,427 @@
+{
+ "run_id": "2026-10-22_refit1",
+ "created": "2026-10-22T03:58:38",
+ "last_known_quarter": "2026-04-01",
+ "last_data_quarter": "2026-07-01",
+ "models": [
+  "gb",
+  "ngb",
+  "dfm"
+ ],
+ "settings": {
+  "targets": [
+   "gdp",
+   "cons",
+   "inv",
+   "inv_cap"
+  ],
+  "horizon": 8,
+  "test_len": 12,
+  "refit_every": 1,
+  "train_starts": [
+   2000,
+   2010
+  ],
+  "feature_types": [
+   "classic",
+   "rolling"
+  ],
+  "availabilities": [
+   1,
+   2,
+   3
+  ],
+  "variable_sets": {
+   "short": [
+    "brent",
+    "retail_real",
+    "miacr",
+    "ipi"
+   ],
+   "medium": [
+    "brent",
+    "retail_real",
+    "miacr",
+    "ipi",
+    "reer",
+    "ex_usd",
+    "im_usd",
+    "un",
+    "comm_freight"
+   ],
+   "all": null
+  }
+ },
+ "iep_vintages": [
+  {
+   "name": "gdp_2021",
+   "vintage_id": 501351,
+   "vintage_date": "2026-10-01"
+  },
+  {
+   "name": "gdp_2008",
+   "vintage_id": 501351,
+   "vintage_date": "2026-10-01"
+  },
+  {
+   "name": "gdp_2003",
+   "vintage_id": 501351,
+   "vintage_date": "2026-10-01"
+  },
+  {
+   "name": "cons_2021",
+   "vintage_id": 501351,
+   "vintage_date": "2026-10-01"
+  },
+  {
+   "name": "cons_2008",
+   "vintage_id": 501351,
+   "vintage_date": "2026-10-01"
+  },
+  {
+   "name": "cons_2003",
+   "vintage_id": 501351,
+   "vintage_date": "2026-10-01"
+  },
+  {
+   "name": "inv_2021",
+   "vintage_id": 501351,
+   "vintage_date": "2026-10-01"
+  },
+  {
+   "name": "inv_2008",
+   "vintage_id": 501351,
+   "vintage_date": "2026-10-01"
+  },
+  {
+   "name": "inv_2003",
+   "vintage_id": 501351,
+   "vintage_date": "2026-10-01"
+  },
+  {
+   "name": "inv_cap_2021",
+   "vintage_id": 501351,
+   "vintage_date": "2026-10-01"
+  },
+  {
+   "name": "inv_cap_2008",
+   "vintage_id": 501351,
+   "vintage_date": "2026-10-01"
+  },
+  {
+   "name": "inv_cap_2003",
+   "vintage_id": 501351,
+   "vintage_date": "2026-10-01"
+  },
+  {
+   "name": "ipi",
+   "vintage_id": 505371,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ipi_mining",
+   "vintage_id": 505404,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ipi_manufacturing",
+   "vintage_id": 505404,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "pi_agriculture",
+   "vintage_id": 505384,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "pv_meat",
+   "vintage_id": 505410,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "pv_milk",
+   "vintage_id": 505410,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "pv_eggs",
+   "vintage_id": 505410,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "comm_freight",
+   "vintage_id": 505376,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "rail_load",
+   "vintage_id": 505378,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "constr_vol",
+   "vintage_id": 505358,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "build_comis",
+   "vintage_id": 505365,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "retail_nom",
+   "vintage_id": 505375,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "retail_nom_food",
+   "vintage_id": 505375,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "retail_nom_nonfood",
+   "vintage_id": 505375,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "retail_real",
+   "vintage_id": 505375,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "retail_real_food",
+   "vintage_id": 505375,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "retail_real_nonfood",
+   "vintage_id": 505375,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "market_service_vol_real",
+   "vintage_id": 505360,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "wholesale_nom",
+   "vintage_id": 505355,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "wholesale_real",
+   "vintage_id": 505387,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "cpi",
+   "vintage_id": 505386,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "cpi_food",
+   "vintage_id": 505386,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "cpi_alchohol",
+   "vintage_id": 505386,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "cpi_nonfood",
+   "vintage_id": 505386,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "cpi_services",
+   "vintage_id": 505386,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ppi_oil",
+   "vintage_id": 505370,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ppi_coal",
+   "vintage_id": 505370,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ppi_gas",
+   "vintage_id": 505370,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ppi_gasoline",
+   "vintage_id": 505370,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ppi_diesel",
+   "vintage_id": 505370,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ppi_residual",
+   "vintage_id": 505370,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ppi_animal_husbandry",
+   "vintage_id": 505368,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ppi_meat",
+   "vintage_id": 505372,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ppi_poultry",
+   "vintage_id": 505372,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ppi_milk",
+   "vintage_id": 505372,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "ppi_eggs",
+   "vintage_id": 505372,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "pi_inv",
+   "vintage_id": 505392,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "pi_inv_construction",
+   "vintage_id": 505392,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "pi_freight",
+   "vintage_id": 505362,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "loans_deposits",
+   "vintage_id": 505383,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "credit_debt",
+   "vintage_id": 505382,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "credit_debt_overdue",
+   "vintage_id": 505382,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "credit_debt_overdue_suppliers",
+   "vintage_id": 505382,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "credit_debt_overdue_gov",
+   "vintage_id": 505382,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "debit_debt",
+   "vintage_id": 505382,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "debit_debt_overdue",
+   "vintage_id": 505382,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "debit_debt_overdue_customers",
+   "vintage_id": 505382,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "un_15plus",
+   "vintage_id": 505379,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "un_15_72",
+   "vintage_id": 505379,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "labor_demand",
+   "vintage_id": 505379,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "un_workload",
+   "vintage_id": 505379,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "wage_nom",
+   "vintage_id": 505389,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "wage_real",
+   "vintage_id": 505389,
+   "vintage_date": "2026-10-02"
+  },
+  {
+   "name": "brent",
+   "vintage_id": 499831,
+   "vintage_date": "2026-10-05"
+  },
+  {
+   "name": "neer",
+   "vintage_id": 475761,
+   "vintage_date": "2026-08-21"
+  },
+  {
+   "name": "reer",
+   "vintage_id": 475670,
+   "vintage_date": "2026-08-21"
+  },
+  {
+   "name": "m0",
+   "vintage_id": 492695,
+   "vintage_date": "2026-09-19"
+  },
+  {
+   "name": "m1",
+   "vintage_id": 492696,
+   "vintage_date": "2026-09-19"
+  },
+  {
+   "name": "m2",
+   "vintage_id": 492697,
+   "vintage_date": "2026-09-19"
+  },
+  {
+   "name": "ex_usd",
+   "vintage_id": 504020,
+   "vintage_date": "2026-10-13"
+  },
+  {
+   "name": "im_usd",
+   "vintage_id": 504020,
+   "vintage_date": "2026-10-13"
+  },
+  {
+   "name": "miacr",
+   "vintage_id": 506128,
+   "vintage_date": "2026-10-16"
+  }
+ ]
+}

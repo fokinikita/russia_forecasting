@@ -2,10 +2,14 @@
 *.csv
 !preds/
 !preds/*.csv
+!data/iep/metadata.csv
+!results/**/*.csv
 
 # Игнорировать Jupyter Notebook файлы
 *.ipynb
 !metrics.ipynb
+!compare_old_vs_iep.ipynb
+!realtime_results.ipynb
 
 # Игнорировать файлы R
 *.RData

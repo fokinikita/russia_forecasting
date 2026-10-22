@@ -1,0 +1,420 @@
+[INFO] [Q] gdp_2021: ok
+[INFO] [Q] gdp_2008: ok
+[INFO] [Q] gdp_2003: ok
+[INFO] [Q] cons_2021: ok
+[INFO] [Q] cons_2008: ok
+[INFO] [Q] cons_2003: ok
+[INFO] [Q] inv_2021: ok
+[INFO] [Q] inv_2008: ok
+[INFO] [Q] inv_2003: ok
+[INFO] [Q] inv_cap_2021: ok
+[INFO] [Q] inv_cap_2008: ok
+[INFO] [Q] inv_cap_2003: ok
+[INFO] [M] ipi: ok
+[INFO] [M] ipi_mining: ok
+[INFO] [M] ipi_manufacturing: ok
+[INFO] [M] pi_agriculture: ok
+[INFO] [M] pv_meat: ok
+[INFO] [M] pv_milk: ok
+[INFO] [M] pv_eggs: ok
+[INFO] [M] comm_freight: ok
+[INFO] [M] rail_load: ok
+[INFO] [M] constr_vol: ok
+[INFO] [M] build_comis: ok
+[INFO] [M] retail_nom: ok
+[INFO] [M] retail_nom_food: ok
+[INFO] [M] retail_nom_nonfood: ok
+[INFO] [M] retail_real: ok
+[INFO] [M] retail_real_food: ok
+[INFO] [M] retail_real_nonfood: ok
+[INFO] [M] market_service_vol_real: ok
+[INFO] [M] wholesale_nom: ok
+[INFO] [M] wholesale_real: ok
+[INFO] [M] cpi: ok
+[INFO] [M] cpi_food: ok
+[INFO] [M] cpi_alchohol: ok
+[INFO] [M] cpi_nonfood: ok
+[INFO] [M] cpi_services: ok
+[INFO] [M] ppi_oil: ok
+[INFO] [M] ppi_coal: ok
+[INFO] [M] ppi_gas: ok
+[INFO] [M] ppi_gasoline: ok
+[INFO] [M] ppi_diesel: ok
+[INFO] [M] ppi_residual: ok
+[INFO] [M] ppi_animal_husbandry: ok
+[INFO] [M] ppi_meat: ok
+[INFO] [M] ppi_poultry: ok
+[INFO] [M] ppi_milk: ok
+[INFO] [M] ppi_eggs: ok
+[INFO] [M] pi_inv: ok
+[INFO] [M] pi_inv_construction: ok
+[INFO] [M] pi_freight: ok
+[INFO] [M] loans_deposits: ok
+[INFO] [M] credit_debt: ok
+[INFO] [M] credit_debt_overdue: ok
+[INFO] [M] credit_debt_overdue_suppliers: ok
+[INFO] [M] credit_debt_overdue_gov: ok
+[INFO] [M] debit_debt: ok
+[INFO] [M] debit_debt_overdue: ok
+[INFO] [M] debit_debt_overdue_customers: ok
+[INFO] [M] un_15plus: ok
+[INFO] [M] un_15_72: ok
+[INFO] [M] labor_demand: ok
+[INFO] [M] un_workload: ok
+[INFO] [M] wage_nom: ok
+[INFO] [M] wage_real: ok
+[INFO] [M] brent: ok
+[INFO] [M] neer: ok
+[INFO] [M] reer: ok
+[INFO] [M] m0: ok
+[INFO] [M] m1: ok
+[INFO] [M] m2: ok
+[INFO] [M] ex_usd: ok
+[INFO] [M] im_usd: ok
+[INFO] [D] miacr: ok
+[INFO] Saved IEP data to C:\Users\pc\Dropbox\ПК\Desktop\russia_forecasting\data\iep
+[INFO] backtest: test 2023-07-01 -> 2026-04-01, origins 2021-10-01 -> 2026-04-01, 5 estimation points
+[INFO] [gb] 1152 specifications, 5 estimation points, 7 workers
+[INFO] [gb] 57/1152 done, 3.8 min, eta 73.0 min
+[INFO] [gb] 114/1152 done, 7.2 min, eta 65.7 min
+[INFO] [gb] 171/1152 done, 9.3 min, eta 53.5 min
+[INFO] [gb] 228/1152 done, 11.1 min, eta 44.8 min
+[INFO] [gb] 285/1152 done, 12.4 min, eta 37.8 min
+[INFO] [gb] 342/1152 done, 13.4 min, eta 31.8 min
+[INFO] [gb] 399/1152 done, 14.3 min, eta 26.9 min
+[INFO] [gb] 456/1152 done, 14.5 min, eta 22.2 min
+[INFO] [gb] 513/1152 done, 15.0 min, eta 18.6 min
+[INFO] [gb] 570/1152 done, 15.6 min, eta 15.9 min
+[INFO] [gb] 627/1152 done, 15.8 min, eta 13.2 min
+[INFO] [gb] 684/1152 done, 16.0 min, eta 11.0 min
+[INFO] [gb] 741/1152 done, 16.4 min, eta 9.1 min
+[INFO] [gb] 798/1152 done, 16.7 min, eta 7.4 min
+[INFO] [gb] 855/1152 done, 16.8 min, eta 5.8 min
+[INFO] [gb] 912/1152 done, 17.1 min, eta 4.5 min
+[INFO] [gb] 969/1152 done, 17.3 min, eta 3.3 min
+[INFO] [gb] 1026/1152 done, 17.4 min, eta 2.1 min
+[INFO] [gb] 1083/1152 done, 17.6 min, eta 1.1 min
+[INFO] [gb] 1140/1152 done, 17.8 min, eta 0.2 min
+[INFO] [gb] 1152/1152 done, 17.8 min, eta 0.0 min
+[INFO] [ngb] 1152 specifications, 5 estimation points, 7 workers
+[INFO] [ngb] 57/1152 done, 0.9 min, eta 16.8 min
+[INFO] [ngb] 114/1152 done, 1.5 min, eta 13.9 min
+[INFO] [ngb] 171/1152 done, 2.0 min, eta 11.4 min
+[INFO] [ngb] 228/1152 done, 2.6 min, eta 10.6 min
+[INFO] [ngb] 285/1152 done, 3.3 min, eta 10.0 min
+[INFO] [ngb] 342/1152 done, 3.8 min, eta 8.9 min
+[INFO] [ngb] 399/1152 done, 4.3 min, eta 8.1 min
+[INFO] [ngb] 456/1152 done, 4.8 min, eta 7.4 min
+[INFO] [ngb] 513/1152 done, 5.4 min, eta 6.7 min
+[INFO] [ngb] 570/1152 done, 6.0 min, eta 6.1 min
+[INFO] [ngb] 627/1152 done, 6.4 min, eta 5.3 min
+[INFO] [ngb] 684/1152 done, 6.9 min, eta 4.7 min
+[INFO] [ngb] 741/1152 done, 7.3 min, eta 4.0 min
+[INFO] [ngb] 798/1152 done, 7.8 min, eta 3.5 min
+[INFO] [ngb] 855/1152 done, 8.5 min, eta 2.9 min
+[INFO] [ngb] 912/1152 done, 9.1 min, eta 2.4 min
+[INFO] [ngb] 969/1152 done, 9.8 min, eta 1.8 min
+[INFO] [ngb] 1026/1152 done, 10.3 min, eta 1.3 min
+[INFO] [ngb] 1083/1152 done, 10.9 min, eta 0.7 min
+[INFO] [ngb] 1140/1152 done, 11.4 min, eta 0.1 min
+[INFO] [ngb] 1152/1152 done, 11.6 min, eta 0.0 min
+[INFO] [dfm] 36 specifications, 5 estimation points, 7 workers
+[INFO] [dfm] 1/36 done, 0.8 min, eta 27.1 min
+[INFO] [dfm] 2/36 done, 1.5 min, eta 24.9 min
+[INFO] [dfm] 3/36 done, 1.9 min, eta 21.3 min
+[INFO] [dfm] 4/36 done, 2.3 min, eta 18.5 min
+[INFO] [dfm] 5/36 done, 2.6 min, eta 16.3 min
+[INFO] [dfm] 6/36 done, 3.3 min, eta 16.5 min
+[INFO] [dfm] 7/36 done, 3.4 min, eta 14.1 min
+[INFO] [dfm] 8/36 done, 3.5 min, eta 12.4 min
+[INFO] [dfm] 9/36 done, 3.6 min, eta 10.9 min
+[INFO] [dfm] 10/36 done, 4.1 min, eta 10.6 min
+[ERROR] [dfm] dfm/2010/all/rolling/a1 failed: MemoryError: Unable to allocate 13.9 MiB for an array with shape (189, 189, 51) and data type float64
+[INFO] [dfm] 11/36 done, 4.2 min, eta 9.6 min
+[INFO] [dfm] 12/36 done, 4.5 min, eta 9.1 min
+[INFO] [dfm] 13/36 done, 4.7 min, eta 8.3 min
+[INFO] [dfm] 14/36 done, 4.7 min, eta 7.3 min
+[ERROR] [dfm] dfm/2000/all/rolling/a3 failed: MemoryError: Unable to allocate 24.8 MiB for an array with shape (91, 189, 189) and data type float64
+[INFO] [dfm] 15/36 done, 4.8 min, eta 6.7 min
+[ERROR] [dfm] dfm/2000/all/rolling/a1 failed: MemoryError: Unable to allocate 24.8 MiB for an array with shape (91, 189, 189) and data type float64
+[INFO] [dfm] 16/36 done, 4.8 min, eta 6.0 min
+[INFO] [dfm] 17/36 done, 4.8 min, eta 5.4 min
+[INFO] [dfm] 18/36 done, 4.8 min, eta 4.8 min
+[INFO] [dfm] 19/36 done, 4.9 min, eta 4.4 min
+[INFO] [dfm] 20/36 done, 5.0 min, eta 4.0 min
+[INFO] [dfm] 21/36 done, 5.0 min, eta 3.6 min
+[INFO] [dfm] 22/36 done, 5.1 min, eta 3.2 min
+[INFO] [dfm] 23/36 done, 5.1 min, eta 2.9 min
+[INFO] [dfm] 24/36 done, 5.1 min, eta 2.5 min
+[INFO] [dfm] 25/36 done, 5.1 min, eta 2.3 min
+[INFO] [dfm] 26/36 done, 5.1 min, eta 2.0 min
+[INFO] [dfm] 27/36 done, 5.2 min, eta 1.7 min
+[INFO] [dfm] 28/36 done, 5.2 min, eta 1.5 min
+[INFO] [dfm] 29/36 done, 5.2 min, eta 1.3 min
+[INFO] [dfm] 30/36 done, 5.2 min, eta 1.0 min
+[INFO] [dfm] 31/36 done, 5.2 min, eta 0.8 min
+[INFO] [dfm] 32/36 done, 5.2 min, eta 0.7 min
+[INFO] [dfm] 33/36 done, 5.3 min, eta 0.5 min
+[INFO] [dfm] 34/36 done, 7.1 min, eta 0.4 min
+[INFO] [dfm] 35/36 done, 8.3 min, eta 0.2 min
+[INFO] [dfm] 36/36 done, 15.8 min, eta 0.0 min
+[INFO] [tabnet] 1152 specifications, 5 estimation points, 7 workers
+[ERROR] [tabnet] tabnet/2000/all/rolling/a1/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 181])
+C:\Users\pc\Dropbox\ПК\Desktop\giga_data\.venv\Lib\site-packages\joblib\externals\loky\process_executor.py:782: UserWarning: A worker stopped while some jobs were given to the executor. This can be caused by a too short worker timeout or by a memory leak.
+  warnings.warn(
+[ERROR] [tabnet] tabnet/2000/all/rolling/a1/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 181])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a1/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 181])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a2/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 181])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a2/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 181])
+[INFO] [tabnet] 57/1152 done, 4.3 min, eta 83.3 min
+[ERROR] [tabnet] tabnet/2000/all/rolling/a3/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 181])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a3/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 181])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a3/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 181])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a3/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 181])
+[INFO] [tabnet] 114/1152 done, 7.6 min, eta 69.1 min
+[INFO] [tabnet] 171/1152 done, 10.3 min, eta 59.4 min
+[ERROR] [tabnet] tabnet/2000/all/classic/a1/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 61])
+[ERROR] [tabnet] tabnet/2000/all/classic/a1/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 61])
+[ERROR] [tabnet] tabnet/2000/all/classic/a1/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 61])
+[ERROR] [tabnet] tabnet/2000/all/classic/a1/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 61])
+[INFO] [tabnet] 228/1152 done, 14.1 min, eta 57.0 min
+[ERROR] [tabnet] tabnet/2000/all/classic/a2/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 61])
+[ERROR] [tabnet] tabnet/2000/all/classic/a2/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 61])
+[ERROR] [tabnet] tabnet/2000/all/classic/a3/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 61])
+[ERROR] [tabnet] tabnet/2000/all/classic/a3/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 61])
+[ERROR] [tabnet] tabnet/2000/all/classic/a3/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 61])
+[ERROR] [tabnet] tabnet/2000/all/classic/a3/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 61])
+[INFO] [tabnet] 285/1152 done, 17.8 min, eta 54.2 min
+[INFO] [tabnet] 342/1152 done, 20.5 min, eta 48.7 min
+[ERROR] [tabnet] tabnet/2000/short/rolling/a1/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a1/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[INFO] [tabnet] 399/1152 done, 23.4 min, eta 44.2 min
+[ERROR] [tabnet] tabnet/2000/short/rolling/a1/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a1/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a2/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a2/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a2/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a2/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a3/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a3/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[INFO] [tabnet] 456/1152 done, 27.0 min, eta 41.3 min
+[ERROR] [tabnet] tabnet/2000/short/rolling/a3/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a3/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a1/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a1/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a1/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[INFO] [tabnet] 513/1152 done, 30.7 min, eta 38.2 min
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a2/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a2/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a2/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a3/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a3/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a3/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a3/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[INFO] [tabnet] 570/1152 done, 34.0 min, eta 34.7 min
+[INFO] [tabnet] 627/1152 done, 36.3 min, eta 30.4 min
+[INFO] [tabnet] 684/1152 done, 38.7 min, eta 26.5 min
+[INFO] [tabnet] 741/1152 done, 41.1 min, eta 22.8 min
+[ERROR] [tabnet] tabnet/2000/short/classic/a1/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a1/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a1/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[INFO] [tabnet] 798/1152 done, 44.6 min, eta 19.8 min
+[ERROR] [tabnet] tabnet/2000/short/classic/a2/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a2/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a2/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a3/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a3/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a3/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[INFO] [tabnet] 855/1152 done, 48.5 min, eta 16.9 min
+[ERROR] [tabnet] tabnet/2000/short/classic/a3/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a1/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a1/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a1/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a1/inv_cap/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a2/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a2/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a2/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[INFO] [tabnet] 912/1152 done, 52.2 min, eta 13.7 min
+[ERROR] [tabnet] tabnet/2000/medium/classic/a3/gdp/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a3/cons/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a3/inv/h6 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[INFO] [tabnet] 969/1152 done, 55.9 min, eta 10.6 min
+[INFO] [tabnet] 1026/1152 done, 58.8 min, eta 7.2 min
+[INFO] [tabnet] 1083/1152 done, 61.5 min, eta 3.9 min
+[INFO] [tabnet] 1140/1152 done, 64.1 min, eta 0.7 min
+[INFO] [tabnet] 1152/1152 done, 64.7 min, eta 0.0 min
+[WARNING] 64 specifications failed, see results\runs\2026-10-22\backtest\failed_specs.csv
+[INFO] metrics saved to results\runs\2026-10-22\backtest
+[INFO] future: origin 2026-07-01, targets known up to 2026-04-01
+[INFO] [gb] 1152 specifications, 1 estimation points, 7 workers
+[INFO] [gb] 57/1152 done, 1.6 min, eta 31.7 min
+[INFO] [gb] 114/1152 done, 3.4 min, eta 31.4 min
+[INFO] [gb] 171/1152 done, 5.2 min, eta 29.8 min
+[INFO] [gb] 228/1152 done, 6.1 min, eta 24.8 min
+[INFO] [gb] 285/1152 done, 6.6 min, eta 20.0 min
+[INFO] [gb] 342/1152 done, 7.1 min, eta 16.9 min
+[INFO] [gb] 399/1152 done, 7.5 min, eta 14.2 min
+[INFO] [gb] 456/1152 done, 7.6 min, eta 11.6 min
+[INFO] [gb] 513/1152 done, 7.8 min, eta 9.7 min
+[INFO] [gb] 570/1152 done, 8.0 min, eta 8.1 min
+[INFO] [gb] 627/1152 done, 8.0 min, eta 6.7 min
+[INFO] [gb] 684/1152 done, 8.1 min, eta 5.6 min
+[INFO] [gb] 741/1152 done, 8.3 min, eta 4.6 min
+[INFO] [gb] 798/1152 done, 8.4 min, eta 3.7 min
+[INFO] [gb] 855/1152 done, 8.4 min, eta 2.9 min
+[INFO] [gb] 912/1152 done, 8.5 min, eta 2.2 min
+[INFO] [gb] 969/1152 done, 8.6 min, eta 1.6 min
+[INFO] [gb] 1026/1152 done, 8.6 min, eta 1.1 min
+[INFO] [gb] 1083/1152 done, 8.7 min, eta 0.6 min
+[INFO] [gb] 1140/1152 done, 8.7 min, eta 0.1 min
+[INFO] [gb] 1152/1152 done, 8.7 min, eta 0.0 min
+[INFO] [ngb] 1152 specifications, 1 estimation points, 7 workers
+[INFO] [ngb] 57/1152 done, 0.4 min, eta 7.4 min
+[INFO] [ngb] 114/1152 done, 0.8 min, eta 6.9 min
+[INFO] [ngb] 171/1152 done, 1.1 min, eta 6.1 min
+[INFO] [ngb] 228/1152 done, 1.4 min, eta 5.6 min
+[INFO] [ngb] 285/1152 done, 1.8 min, eta 5.4 min
+[INFO] [ngb] 342/1152 done, 2.0 min, eta 4.8 min
+[INFO] [ngb] 399/1152 done, 2.3 min, eta 4.4 min
+[INFO] [ngb] 456/1152 done, 2.6 min, eta 4.0 min
+[INFO] [ngb] 513/1152 done, 2.9 min, eta 3.7 min
+[INFO] [ngb] 570/1152 done, 3.2 min, eta 3.3 min
+[INFO] [ngb] 627/1152 done, 3.4 min, eta 2.9 min
+[INFO] [ngb] 684/1152 done, 3.6 min, eta 2.5 min
+[INFO] [ngb] 741/1152 done, 3.9 min, eta 2.1 min
+[INFO] [ngb] 798/1152 done, 4.1 min, eta 1.8 min
+[INFO] [ngb] 855/1152 done, 4.4 min, eta 1.5 min
+[INFO] [ngb] 912/1152 done, 4.6 min, eta 1.2 min
+[INFO] [ngb] 969/1152 done, 4.8 min, eta 0.9 min
+[INFO] [ngb] 1026/1152 done, 5.0 min, eta 0.6 min
+[INFO] [ngb] 1083/1152 done, 5.2 min, eta 0.3 min
+[INFO] [ngb] 1140/1152 done, 5.4 min, eta 0.1 min
+[INFO] [ngb] 1152/1152 done, 5.5 min, eta 0.0 min
+[INFO] [dfm] 36 specifications, 1 estimation points, 7 workers
+[INFO] [dfm] 1/36 done, 0.2 min, eta 6.0 min
+[INFO] [dfm] 2/36 done, 0.3 min, eta 5.2 min
+[INFO] [dfm] 3/36 done, 0.4 min, eta 4.1 min
+[INFO] [dfm] 4/36 done, 0.4 min, eta 3.6 min
+[INFO] [dfm] 5/36 done, 0.5 min, eta 3.2 min
+[INFO] [dfm] 6/36 done, 0.6 min, eta 2.9 min
+[INFO] [dfm] 7/36 done, 0.6 min, eta 2.5 min
+[INFO] [dfm] 8/36 done, 0.6 min, eta 2.2 min
+[INFO] [dfm] 9/36 done, 0.6 min, eta 1.9 min
+[INFO] [dfm] 10/36 done, 0.7 min, eta 1.9 min
+[INFO] [dfm] 11/36 done, 0.8 min, eta 1.9 min
+[INFO] [dfm] 12/36 done, 0.9 min, eta 1.9 min
+[INFO] [dfm] 13/36 done, 1.0 min, eta 1.7 min
+[INFO] [dfm] 14/36 done, 1.0 min, eta 1.5 min
+[INFO] [dfm] 15/36 done, 1.0 min, eta 1.4 min
+[INFO] [dfm] 16/36 done, 1.1 min, eta 1.3 min
+[INFO] [dfm] 17/36 done, 1.1 min, eta 1.2 min
+[INFO] [dfm] 18/36 done, 1.2 min, eta 1.2 min
+[INFO] [dfm] 19/36 done, 1.2 min, eta 1.1 min
+[INFO] [dfm] 20/36 done, 1.2 min, eta 1.0 min
+[INFO] [dfm] 21/36 done, 1.2 min, eta 0.9 min
+[INFO] [dfm] 22/36 done, 1.2 min, eta 0.8 min
+[INFO] [dfm] 23/36 done, 1.3 min, eta 0.7 min
+[INFO] [dfm] 24/36 done, 1.3 min, eta 0.6 min
+[INFO] [dfm] 25/36 done, 1.3 min, eta 0.6 min
+[INFO] [dfm] 26/36 done, 1.3 min, eta 0.5 min
+[INFO] [dfm] 27/36 done, 1.3 min, eta 0.4 min
+[INFO] [dfm] 28/36 done, 1.3 min, eta 0.4 min
+[INFO] [dfm] 29/36 done, 1.3 min, eta 0.3 min
+[INFO] [dfm] 30/36 done, 1.3 min, eta 0.3 min
+[INFO] [dfm] 31/36 done, 1.6 min, eta 0.3 min
+[INFO] [dfm] 32/36 done, 1.8 min, eta 0.2 min
+[INFO] [dfm] 33/36 done, 2.4 min, eta 0.2 min
+[INFO] [dfm] 34/36 done, 4.1 min, eta 0.2 min
+[INFO] [dfm] 35/36 done, 4.1 min, eta 0.1 min
+[INFO] [dfm] 36/36 done, 4.2 min, eta 0.0 min
+[INFO] [tabnet] 1152 specifications, 1 estimation points, 7 workers
+[ERROR] [tabnet] tabnet/2000/all/rolling/a1/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 184])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a1/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 184])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a1/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 184])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a1/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 184])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a2/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 184])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a2/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 184])
+[INFO] [tabnet] 57/1152 done, 1.4 min, eta 26.8 min
+[ERROR] [tabnet] tabnet/2000/all/rolling/a2/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 184])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a3/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 184])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a3/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 184])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a3/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 184])
+[ERROR] [tabnet] tabnet/2000/all/rolling/a3/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 184])
+[INFO] [tabnet] 114/1152 done, 2.7 min, eta 24.6 min
+[INFO] [tabnet] 171/1152 done, 3.6 min, eta 20.6 min
+[ERROR] [tabnet] tabnet/2000/all/classic/a1/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 62])
+[ERROR] [tabnet] tabnet/2000/all/classic/a1/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 62])
+[ERROR] [tabnet] tabnet/2000/all/classic/a2/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 62])
+[INFO] [tabnet] 228/1152 done, 5.0 min, eta 20.2 min
+[ERROR] [tabnet] tabnet/2000/all/classic/a2/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 62])
+[ERROR] [tabnet] tabnet/2000/all/classic/a2/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 62])
+[ERROR] [tabnet] tabnet/2000/all/classic/a3/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 62])
+[ERROR] [tabnet] tabnet/2000/all/classic/a3/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 62])
+[ERROR] [tabnet] tabnet/2000/all/classic/a3/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 62])
+[ERROR] [tabnet] tabnet/2000/all/classic/a3/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 62])
+[INFO] [tabnet] 285/1152 done, 6.3 min, eta 19.1 min
+[INFO] [tabnet] 342/1152 done, 7.3 min, eta 17.2 min
+[ERROR] [tabnet] tabnet/2000/short/rolling/a1/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a1/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[INFO] [tabnet] 399/1152 done, 8.3 min, eta 15.7 min
+[ERROR] [tabnet] tabnet/2000/short/rolling/a1/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a1/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a2/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a2/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a2/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a2/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a3/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[INFO] [tabnet] 456/1152 done, 9.6 min, eta 14.6 min
+[ERROR] [tabnet] tabnet/2000/short/rolling/a3/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a3/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/short/rolling/a3/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 13])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a1/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a1/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a1/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a1/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a2/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[INFO] [tabnet] 513/1152 done, 10.9 min, eta 13.5 min
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a2/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a2/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a2/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a3/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a3/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[ERROR] [tabnet] tabnet/2000/medium/rolling/a3/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 28])
+[INFO] [tabnet] 570/1152 done, 12.2 min, eta 12.5 min
+[INFO] [tabnet] 627/1152 done, 13.0 min, eta 10.9 min
+[INFO] [tabnet] 684/1152 done, 13.9 min, eta 9.5 min
+[INFO] [tabnet] 741/1152 done, 14.8 min, eta 8.2 min
+[ERROR] [tabnet] tabnet/2000/short/classic/a1/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a1/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a1/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a1/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[INFO] [tabnet] 798/1152 done, 16.0 min, eta 7.1 min
+[ERROR] [tabnet] tabnet/2000/short/classic/a2/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a2/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a2/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a2/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a3/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/short/classic/a3/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[INFO] [tabnet] 855/1152 done, 17.4 min, eta 6.0 min
+[ERROR] [tabnet] tabnet/2000/short/classic/a3/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 5])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a1/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a1/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a1/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a1/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a2/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a2/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[INFO] [tabnet] 912/1152 done, 18.5 min, eta 4.9 min
+[ERROR] [tabnet] tabnet/2000/medium/classic/a2/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a2/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a3/gdp/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a3/cons/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a3/inv/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[ERROR] [tabnet] tabnet/2000/medium/classic/a3/inv_cap/h5 failed: ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 10])
+[INFO] [tabnet] 969/1152 done, 19.7 min, eta 3.7 min
+[INFO] [tabnet] 1026/1152 done, 20.7 min, eta 2.5 min
+[INFO] [tabnet] 1083/1152 done, 21.5 min, eta 1.4 min
+[INFO] [tabnet] 1140/1152 done, 22.4 min, eta 0.2 min
+[INFO] [tabnet] 1152/1152 done, 22.7 min, eta 0.0 min
+[WARNING] 66 specifications failed, see results\runs\2026-10-22\future\failed_specs.csv
+[INFO] future forecasts saved to results\runs\2026-10-22\future
+EXIT 0

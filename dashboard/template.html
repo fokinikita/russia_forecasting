@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Макропрогноз</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 4px 20px rgba(26, 26, 46, 0.3);
+        }
+
+        .header-left h1 {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .header-left p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .update-badge {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 100px;
+            color: #a8d8ea;
+            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .update-badge strong {
+            color: #fff;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Controls */
+        .controls {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 24px;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+        .control-tabs {display:grid;grid-template-columns:1.35fr 1.35fr 1fr 1fr 1.35fr;gap:10px;width:100%;}
+        .control-tab {padding:13px 14px;border:1px solid #dbe3f3;border-radius:12px;background:#f8fafc;min-width:0;}
+        .control-tab:first-child {background:#eef2ff;border-color:#a5b4fc;}
+        .control-tab label {display:block;margin-bottom:7px;font-size:10.5px;font-weight:800;color:#475569;letter-spacing:.06em;text-transform:uppercase;}
+        .control-tab select {width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172554;font:600 13px inherit;}
+        @media(max-width:960px){.control-tabs{grid-template-columns:repeat(2,minmax(0,1fr));}}
+        @media(max-width:560px){.control-tabs{grid-template-columns:1fr;}}
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .control-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .control-group select {
+            padding: 8px 14px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fafafa;
+            color: #1a1a2e;
+            transition: all 0.2s;
+            min-width: 180px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .control-group select:hover {
+            border-color: #94a3b8;
+        }
+
+        .control-group select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+            background: #fff;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #4f46e5;
+            border: 1.5px solid #4f46e5;
+        }
+
+        .btn-outline:hover {
+            background: #f5f3ff;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35);
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Metrics Row */
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: all 0.2s;
+            position: relative;
+            cursor: help;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .metric-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9ca3af;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .metric-label .help-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: help;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .metric-label .help-icon:hover {
+            background: #4f46e5;
+            color: #fff;
+        }
+
+        .metric-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-top: 4px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .metric-value .change {
+            font-size: 13px;
+            font-weight: 500;
+            padding: 2px 10px;
+            border-radius: 100px;
+        }
+
+        .change.positive {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .change.negative {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .metric-value .sub {
+            font-size: 13px;
+            font-weight: 400;
+            color: #9ca3af;
+        }
+
+        /* Model Metrics Table */
+        .model-metrics-container {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 14px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px 24px;
+        }
+
+        .model-metrics-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .model-metrics-title .badge {
+            background: #4f46e5;
+            color: #fff;
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 100px;
+            text-transform: none;
+        }
+
+        .model-metrics-list {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .model-metric-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .model-metric-item .label {
+            color: #9ca3af;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .model-metric-item .value {
+            font-weight: 700;
+            color: #1a1a2e;
+            font-size: 15px;
+        }
+
+        .model-metric-item .value.good {
+            color: #059669;
+        }
+
+        .model-metric-item .value.warning {
+            color: #d97706;
+        }
+
+        .model-metric-item .value.bad {
+            color: #dc2626;
+        }
+
+        .model-quality-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quality-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .quality-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .quality-dot.good {
+            background: #059669;
+        }
+        .quality-dot.warning {
+            background: #d97706;
+        }
+        .quality-dot.bad {
+            background: #dc2626;
+        }
+
+        /* Chart + Components Side-by-Side */
+        .chart-with-sidebar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .chart-container {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            min-width: 0;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .chart-title span {
+            font-weight: 400;
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 380px;
+        }
+
+        /* Components Sidebar */
+        .components-sidebar {
+            width: 230px;
+            flex-shrink: 0;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .components-sidebar-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .components-sidebar-title .subtitle {
+            font-weight: 400;
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .components-sidebar .legend-row {
+            display: flex;
+            gap: 10px;
+            font-size: 10px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .components-sidebar .legend-row span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .components-sidebar .legend-row .dot {
+            width: 12px;
+            height: 3px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .components-sidebar .legend-row .dot.actual {
+            background: #4f46e5;
+        }
+
+        .components-sidebar .legend-row .dot.forecast {
+            background: transparent;
+            border-top: 2px dashed #f59e0b;
+            height: 0;
+            width: 14px;
+        }
+
+        .components-sidebar table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .components-sidebar th {
+            text-align: left;
+            padding: 4px 6px 4px 0;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 2px solid #f0f2f5;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .components-sidebar th:last-child {
+            text-align: center;
+        }
+
+        .components-sidebar td {
+            text-align: left;
+            padding: 4px 6px 4px 0;
+            border-bottom: 1px solid #f9fafb;
+            color: #1a1a2e;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .components-sidebar td:last-child {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .components-sidebar tr:last-child td {
+            border-bottom: none;
+        }
+
+        .components-sidebar .component-name {
+            font-weight: 400;
+            color: #6b7280;
+            font-size: 11px;
+        }
+
+        .components-sidebar .positive {
+            color: #059669;
+        }
+        .components-sidebar .negative {
+            color: #dc2626;
+        }
+
+        .components-sidebar .actual-value {
+            color: #4f46e5;
+        }
+
+        .components-sidebar .forecast-value {
+            color: #d97706;
+        }
+
+        .components-sidebar .diff-value {
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        /* Custom Tooltip */
+        .metric-tooltip {
+            position: fixed;
+            max-width: 320px;
+            background: #1a1a2e;
+            color: #e5e7eb;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 1000;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .metric-tooltip.visible {
+            opacity: 1;
+        }
+
+        .metric-tooltip .tt-title {
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .metric-tooltip .tt-desc {
+            color: #cbd5e1;
+            font-size: 13px;
+        }
+
+        .metric-tooltip .tt-example {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* Data Table */
+        .data-table {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-top: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            overflow-x: auto;
+        }
+
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 8px 12px 0;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 2px solid #f0f2f5;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .data-table td {
+            padding: 10px 8px 10px 0;
+            border-bottom: 1px solid #f9fafb;
+            color: #1a1a2e;
+        }
+
+        .data-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .data-table .forecast-badge {
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 100px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .data-table .actual-badge {
+            background: #dbeafe;
+            color: #1e40af;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 100px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1001;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .chart-with-sidebar {
+                flex-direction: column;
+            }
+            .components-sidebar {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            .header {
+                padding: 16px 20px;
+            }
+            .header-left h1 {
+                font-size: 20px;
+            }
+            .controls {
+                padding: 16px;
+            }
+            .control-group select {
+                min-width: 140px;
+                font-size: 13px;
+            }
+            .metrics-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .metric-value {
+                font-size: 18px;
+            }
+            .chart-wrapper {
+                height: 280px;
+            }
+            .metric-tooltip {
+                max-width: 260px;
+                font-size: 12px;
+                padding: 12px 14px;
+            }
+            .model-metrics-list {
+                gap: 12px;
+            }
+            .model-metric-item {
+                font-size: 12px;
+            }
+            .model-metric-item .value {
+                font-size: 13px;
+            }
+            .components-sidebar {
+                padding: 14px 12px;
+            }
+            .components-sidebar table {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .metrics-row {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .header-right {
+                justify-content: space-between;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .control-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .control-group select {
+                min-width: 100%;
+            }
+            .metric-tooltip {
+                max-width: 220px;
+                font-size: 11px;
+                padding: 10px 12px;
+            }
+            .model-metrics-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .model-metrics-list {
+                justify-content: space-between;
+            }
+            .model-quality-bar {
+                justify-content: flex-start;
+            }
+            .components-sidebar {
+                padding: 12px 10px;
+            }
+            .components-sidebar table {
+                font-size: 10px;
+            }
+            .components-sidebar td {
+                padding: 3px 4px 3px 0;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        /* ── Additions for the real-data dashboard (same visual language) ── */
+        .control-tabs {grid-template-columns:1.35fr 1.35fr 1fr 1fr 1fr 1fr 1.35fr;}
+        @media(max-width:1200px){.control-tabs{grid-template-columns:repeat(4,minmax(0,1fr));}}
+        @media(max-width:960px){.control-tabs{grid-template-columns:repeat(2,minmax(0,1fr));}}
+        @media(max-width:560px){.control-tabs{grid-template-columns:1fr;}}
+        .control-tab.disabled {opacity:.45;}
+        .control-tab.disabled select {cursor:not-allowed;}
+        .control-tab .hint {display:block;margin-top:5px;font-size:10.5px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+        .seg {display:inline-flex;background:#f1f5f9;border-radius:10px;padding:3px;gap:2px;}
+        .seg button {border:none;background:transparent;padding:6px 12px;border-radius:8px;font:500 12px inherit;color:#475569;cursor:pointer;font-family:inherit;}
+        .seg button.active {background:#fff;color:#4f46e5;box-shadow:0 1px 3px rgba(0,0,0,.08);font-weight:600;}
+        .chart-actions {flex-wrap:wrap;align-items:center;}
+        .chart-actions select {padding:6px 10px;border:1.5px solid #e5e7eb;border-radius:8px;font:500 12px inherit;background:#fafafa;color:#1a1a2e;font-family:inherit;}
+        .chart-note {font-size:12px;color:#6b7280;margin-top:10px;line-height:1.5;}
+
+        .components-sidebar {width:380px;}
+        .components-sidebar td, .components-sidebar th {text-align:right;padding-right:8px;}
+        .components-sidebar td:first-child, .components-sidebar th:first-child {text-align:left;}
+        .components-sidebar td:last-child, .components-sidebar th:last-child {text-align:center;padding-right:0;}
+        .components-sidebar tbody tr {cursor:pointer;transition:background .15s;}
+        .components-sidebar tbody tr:hover td {background:#f8fafc;}
+        .components-sidebar tbody tr.selected td {background:#eef2ff;}
+        .components-sidebar .h-cell {font-weight:600;color:#1a1a2e;}
+        .components-sidebar .h-cell small {display:block;font-weight:400;color:#9ca3af;font-size:10px;}
+        .components-sidebar .naive-value {color:#9ca3af;font-weight:500;}
+        .components-sidebar .legend-row .dot.good {background:#059669;width:9px;height:9px;border-radius:50%;}
+        .components-sidebar .legend-row .dot.bad {background:#dc2626;width:9px;height:9px;border-radius:50%;}
+        .sidebar-foot {margin-top:auto;padding-top:10px;font-size:10.5px;color:#9ca3af;line-height:1.45;}
+
+        .model-metrics-title .badge.spec {background:#eef2ff;color:#3730a3;}
+        .model-metric-item .sub {font-size:12px;color:#9ca3af;}
+        .quality-indicator.good {color:#065f46;}
+        .quality-indicator.bad {color:#991b1b;}
+        .data-table .compare-col {color:#db2777;}
+        .empty-note {padding:40px 0;text-align:center;color:#9ca3af;font-size:14px;}
+        .control-tabs {grid-template-columns:2.1fr 1.3fr 1fr 1fr 1.1fr 1.3fr;}
+        .control-tab label {display:flex;align-items:center;gap:6px;}
+        .control-tab .help-icon, .info-help {display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#e5e7eb;color:#6b7280;font-size:9.5px;font-weight:700;cursor:help;letter-spacing:0;}
+        .control-tab .help-icon:hover {background:#4f46e5;color:#fff;}
+        .avail-info {display:flex;flex-direction:column;justify-content:center;}
+        .avail-info .avail-value {font:700 15px inherit;color:#172554;font-family:inherit;}
+        .avail-info .avail-sub {font-size:11px;color:#64748b;margin-top:2px;}
+
+        .info-panel {background:#fff;border-radius:16px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.04);}
+        .info-panel summary {padding:16px 24px;cursor:pointer;font-weight:600;font-size:14px;color:#1a1a2e;list-style:none;display:flex;justify-content:space-between;align-items:center;}
+        .info-panel summary::-webkit-details-marker {display:none;}
+        .info-panel summary .chev {color:#9ca3af;font-size:12px;font-weight:500;}
+        .info-panel[open] summary {border-bottom:1px solid #f0f2f5;}
+        .info-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;padding:18px 24px 22px;}
+        .info-card {background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.55;color:#334155;}
+        .info-card h4 {font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#475569;margin-bottom:8px;font-weight:800;}
+        .info-card dl {display:grid;grid-template-columns:auto 1fr;gap:6px 12px;}
+        .info-card dt {font-weight:700;color:#172554;white-space:nowrap;}
+        .info-card dd {margin:0;}
+        .info-card p + p {margin-top:6px;}
+        @media(max-width:1200px){.control-tabs{grid-template-columns:repeat(3,minmax(0,1fr));}}
+        @media(max-width:760px){.control-tabs{grid-template-columns:repeat(2,minmax(0,1fr));}}
+        @media(max-width:560px){.control-tabs{grid-template-columns:1fr;}.info-card dl{grid-template-columns:1fr;}}
+
+        .multi-select {position:relative;}
+        .multi-select-btn {width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172554;font:600 13px inherit;font-family:inherit;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;}
+        .multi-select-btn::after {content:'▾';color:#64748b;font-size:11px;}
+        .multi-select-panel {display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:240px;background:#fff;border:1px solid #dbe3f3;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:8px;z-index:50;}
+        .multi-select.open .multi-select-panel {display:block;}
+        .multi-select-panel label.opt {display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;font:500 13px inherit;font-family:inherit;color:#1a1a2e;text-transform:none;letter-spacing:0;margin:0;cursor:pointer;}
+        .multi-select-panel label.opt:hover {background:#f1f5f9;}
+        .multi-select-panel label.opt.off {opacity:.4;cursor:not-allowed;}
+        .multi-select-panel .swatch {width:14px;height:3px;border-radius:2px;flex-shrink:0;}
+        .multi-select-panel .clear {display:block;width:100%;margin-top:4px;padding:6px;border:none;background:none;color:#4f46e5;font:600 12px inherit;font-family:inherit;cursor:pointer;text-align:center;}
+
+        .annual-box {margin-top:16px;border-top:1px solid #f0f2f5;padding-top:14px;}
+        .annual-box .annual-title {font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:8px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+        .annual-box .annual-title span {font-weight:400;font-size:11px;color:#9ca3af;}
+        .annual-box table {width:100%;border-collapse:collapse;font-size:13px;}
+        .annual-box th {text-align:left;padding:6px 10px 6px 0;font-size:10.5px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.3px;border-bottom:2px solid #f0f2f5;}
+        .annual-box td {padding:7px 10px 7px 0;border-bottom:1px solid #f9fafb;color:#1a1a2e;}
+        .annual-box td.num {font-weight:700;}
+        .annual-box td.muted {color:#6b7280;font-size:12px;}
+        .annual-box .positive {color:#059669;}
+        .annual-box .negative {color:#dc2626;}
+        .annual-foot {font-size:11px;color:#9ca3af;margin-top:8px;line-height:1.45;}
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1>📊 Макропрогноз</h1>
+                <p>Краткосрочное прогнозирование ВВП и компонентов</p>
+            </div>
+            <div class="header-right">
+                <div class="update-badge">
+                    <span class="status-dot"></span>
+                    Расчёт: <strong id="updateDate">—</strong>
+                </div>
+            </div>
+        </header>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="control-tabs">
+                <div class="control-tab"><label>Показатель</label><select id="indicatorSelect"></select></div>
+                <div class="control-tab"><label>Модель <span class="help-icon" data-tooltip="model">?</span></label><select id="modelSelect"></select></div>
+                <div class="control-tab spec-control"><label>Выборка <span class="help-icon" data-tooltip="sample">?</span></label><select id="sampleSelect"><option value="2000">С 2000 г.</option><option value="2010">С 2010 г.</option></select></div>
+                <div class="control-tab spec-control"><label>Набор переменных <span class="help-icon" data-tooltip="varset">?</span></label><select id="varsetSelect"><option value="short">Короткий</option><option value="medium">Средний</option><option value="all" selected>Полный</option></select></div>
+                <div class="control-tab spec-control"><label>Признаки <span class="help-icon" data-tooltip="ftype">?</span></label><select id="ftypeSelect"><option value="classic">Классические (г/г)</option><option value="rolling">Скользящие средние</option></select></div>
+                <div class="control-tab"><label>Сравнить с моделями</label>
+                    <div class="multi-select" id="compareSelect">
+                        <button type="button" class="multi-select-btn" id="compareBtn">Не сравнивать</button>
+                        <div class="multi-select-panel" id="comparePanel"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanations -->
+        <details class="info-panel" id="infoPanel">
+            <summary>ℹ️ Пояснения: модели, консенсус, наборы переменных, выборка, ретроспектива <span class="chev">показать / скрыть</span></summary>
+            <div class="info-grid" id="infoGrid"></div>
+        </details>
+
+        <!-- Metrics Row -->
+        <div class="metrics-row" id="metricsRow">
+            <div class="metric-card" data-tooltip="current">
+                <div class="metric-label">Последний факт <span class="help-icon">?</span></div>
+                <div class="metric-value" id="metricCurrent">—</div>
+            </div>
+            <div class="metric-card" data-tooltip="forecast">
+                <div class="metric-label"><span id="forecastLabel">Прогноз (след. квартал)</span> <span class="help-icon">?</span></div>
+                <div class="metric-value" id="metricForecast">—</div>
+            </div>
+            <div class="metric-card" data-tooltip="mae">
+                <div class="metric-label">Точность модели (MAE) <span class="help-icon">?</span></div>
+                <div class="metric-value" id="metricMAECard">—</div>
+            </div>
+            <div class="metric-card" data-tooltip="annual">
+                <div class="metric-label"><span id="annualLabel">Прирост за год (оценка)</span> <span class="help-icon">?</span></div>
+                <div class="metric-value" id="metricAnnual">—</div>
+            </div>
+            <div class="metric-card" data-tooltip="lastdate">
+                <div class="metric-label">Дата последнего факта <span class="help-icon">?</span></div>
+                <div class="metric-value" id="metricLastDate" style="font-size:16px;">—</div>
+            </div>
+        </div>
+
+        <!-- Model Metrics -->
+        <div class="model-metrics-container" id="modelMetricsContainer">
+            <div class="model-metrics-title">
+                📊 Качество прогноза на ретроспективных данных
+                <span class="badge" id="modelBadge">—</span>
+                <span class="badge spec" id="specBadge">—</span>
+            </div>
+            <div class="model-metrics-list">
+                <div class="model-metric-item"><span class="label">MAE модели</span><span class="value" id="metricMAE">—</span><span class="sub">п.п.</span></div>
+                <div class="model-metric-item"><span class="label">MAE наивного</span><span class="value" id="metricNaive">—</span><span class="sub">п.п.</span></div>
+                <div class="model-metric-item"><span class="label">Модель / наивный</span><span class="value" id="metricRatio">—</span></div>
+                <div class="model-quality-bar">
+                    <span class="quality-indicator" id="qualityIndicator">
+                        <span class="quality-dot" id="qualityDot"></span>
+                        <span id="qualityLabel">—</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tooltip -->
+        <div class="metric-tooltip" id="metricTooltip">
+            <div class="tt-title" id="ttTitle"></div>
+            <div class="tt-desc" id="ttDesc"></div>
+            <div class="tt-example" id="ttExample"></div>
+        </div>
+
+        <!-- Chart + Horizon metrics -->
+        <div class="chart-with-sidebar">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-title" id="chartTitle">—</div>
+                    <div class="chart-actions">
+                        <div class="seg" id="viewSeg">
+                            <button data-view="level" class="active">Уровни</button>
+                            <button data-view="yoy">Г/г, %</button>
+                            <button data-view="test">Ретроспектива</button>
+                        </div>
+                        <select id="periodSelect">
+                            <option value="5">5 лет</option>
+                            <option value="10" selected>10 лет</option>
+                            <option value="all">С 2000 г.</option>
+                        </select>
+                        <button class="btn btn-success btn-sm" onclick="exportExcel()" title="Все прогнозы и метрики в Excel">📊 Excel</button>
+                        <button class="btn btn-outline btn-sm" onclick="exportCSV()" title="Данные текущего графика">📥 CSV</button>
+                        <button class="btn btn-outline btn-sm" onclick="exportChart()">🖼 PNG</button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="mainChart"></canvas>
+                </div>
+                <div class="chart-note" id="chartNote"></div>
+                <div class="annual-box">
+                    <div class="annual-title">📅 Темп роста за календарный год <span>сумма кварталов года к сумме кварталов прошлого года</span></div>
+                    <table>
+                        <thead id="annualHead"></thead>
+                        <tbody id="annualBody"></tbody>
+                    </table>
+                    <div class="annual-foot" id="annualFoot"></div>
+                </div>
+            </div>
+
+            <div class="components-sidebar">
+                <div class="components-sidebar-title">
+                    <span>🎯 Качество прогноза на ретроспективных данных</span>
+                    <span class="subtitle" id="testPeriod">—</span>
+                </div>
+                <div class="legend-row">
+                    <span><span class="dot good"></span> лучше наивного</span>
+                    <span><span class="dot bad"></span> хуже наивного</span>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Горизонт</th><th>MAE</th><th>Наивный</th><th>Модель / наивный</th><th></th></tr>
+                    </thead>
+                    <tbody id="horizonBody"></tbody>
+                </table>
+                <div class="sidebar-foot">
+                    MAE — средняя абсолютная ошибка прогноза темпа роста г/г, п.п., по 12 кварталам ретроспективы.
+                    «Наивный» — MAE прогноза «темп роста как в последнем известном квартале».
+                    «Модель / наивный» меньше 100% — модель точнее наивного прогноза.
+                    Нажмите на строку, чтобы увидеть исторические прогнозы этого горизонта.
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="data-table">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                <strong style="font-size:15px; color:#1a1a2e;">📋 Данные</strong>
+                <span style="font-size:12px; color:#9ca3af;">Последние 4 квартала факта и прогноз на 8 кварталов · трлн ₽ в ценах 2021 г.</span>
+            </div>
+            <div id="tableContainer">
+                <table>
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Filled by forecasting/dashboard.py
+        const DATA = /*__DASHBOARD_DATA__*/null;
+
+        const MODELS = {
+            consensus: { name: 'Консенсус (медиана топ-10)', option: 'Консенсус топ-10', short: 'Консенсус' },
+            best: { name: 'Лучшая спецификация', option: 'Лучшая спецификация', short: 'Лучшая' },
+            gb: { name: 'CatBoost', option: 'CatBoost', short: 'CatBoost' },
+            ngb: { name: 'NGBoost', option: 'NGBoost', short: 'NGBoost' },
+            dfm: { name: 'DFM', option: 'DFM', short: 'DFM' },
+            tabnet: { name: 'TabNet (нейросеть)', option: 'TabNet (нейросеть)', short: 'TabNet' },
+        };
+        const SELECTED_MODELS = ['consensus', 'best'];
+        const TARGET_OPTIONS = {
+            gdp: 'ВВП в постоянных ценах',
+            cons: 'Потребление дом. хозяйств в пост. ценах',
+            inv: 'Валовое накопление в пост. ценах',
+            inv_cap: 'Валовое накопление осн. капитала в пост. ценах',
+        };
+        const VARSET_NAMES = { short: 'короткий', medium: 'средний', all: 'полный' };
+        const FTYPE_NAMES = { classic: 'классические', rolling: 'скользящие' };
+        const VARIABLE_NAMES = {
+            brent: 'цена нефти Brent', retail_real: 'оборот розничной торговли (реальный)', miacr: 'ставка MIACR',
+            ipi: 'индекс промышленного производства', reer: 'реальный эффективный курс рубля',
+            ex_usd: 'экспорт товаров (ФОБ)', im_usd: 'импорт товаров (ФОБ)', un: 'уровень безработицы',
+            comm_freight: 'коммерческий грузооборот транспорта',
+        };
+        const COLORS = { fact: '#4f46e5', forecast: '#f59e0b', naive: '#9ca3af' };
+        // fixed colour per model for comparison lines (colour follows the model, not the order of selection)
+        const COMPARE_COLORS = { consensus: '#0d9488', best: '#7c3aed', gb: '#db2777', ngb: '#16a34a', dfm: '#0284c7', tabnet: '#dc2626' };
+        const ROMAN = ['I', 'II', 'III', 'IV'];
+        // consensus band: middle half of the top-K forecasts (min-max is driven by single outliers)
+        const BAND_Q = [0.25, 0.75];
+        const BAND_NAME = 'Диапазон 25–75% топ-10';
+
+        // ─── Helpers ───────────────────────────────────────────────────────────────
+        function addQuarters(iso, n) {
+            const [y, m] = iso.split('-').map(Number);
+            const idx = y * 4 + Math.floor((m - 1) / 3) + n;
+            const q = ((idx % 4) + 4) % 4;
+            return `${Math.floor(idx / 4)}-${String(q * 3 + 1).padStart(2, '0')}-01`;
+        }
+        function quarterOf(iso) { return Math.floor((+iso.slice(5, 7) - 1) / 3); }
+        function qShort(iso) { return `${iso.slice(0, 4)} Q${quarterOf(iso) + 1}`; }
+        function qLong(iso) { return `${ROMAN[quarterOf(iso)]} кв. ${iso.slice(0, 4)}`; }
+        function pct(logGrowth) { return logGrowth == null ? null : (Math.exp(logGrowth) - 1) * 100; }
+        function fmt(v, d = 1) { return v == null || isNaN(v) ? '—' : v.toFixed(d); }
+        function signed(v, d = 1) { return v == null || isNaN(v) ? '—' : `${v >= 0 ? '+' : ''}${v.toFixed(d)}`; }
+        function round(v, d = 3) { return v == null || isNaN(v) ? null : +v.toFixed(d); }
+        function quantile(sorted, q) {
+            const v = sorted.filter(x => x != null).sort((a, b) => a - b);
+            if (!v.length) return null;
+            const pos = (v.length - 1) * q, i = Math.floor(pos);
+            return i + 1 < v.length ? v[i] + (v[i + 1] - v[i]) * (pos - i) : v[i];
+        }
+        function mean(arr) {
+            const v = arr.filter(x => x != null && !isNaN(x));
+            return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
+        }
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+        function varList(key) {
+            const vars = DATA.meta.variable_sets[key];
+            return vars ? vars.map(v => VARIABLE_NAMES[v] || v).join(', ') : '';
+        }
+        function nVars(key) {
+            const vars = DATA.meta.variable_sets[key];
+            return vars ? vars.length : DATA.meta.n_all_variables;
+        }
+
+        // ─── Explanations (tooltips + panel) ──────────────────────────────────────
+        function testPeriodText() {
+            const t = DATA.test_dates;
+            return `${qLong(t[0])} – ${qLong(t[t.length - 1])}`;
+        }
+        function buildTooltips() {
+            return {
+                current: {
+                    title: '📌 Последний факт',
+                    description: 'Последнее опубликованное значение показателя в постоянных ценах 2021 г., трлн ₽ (ряды разных баз сшиты в единый ряд). В плашке — темп роста к тому же кварталу прошлого года.',
+                    example: 'Квартальные уровни имеют сезонность, поэтому темп роста считается к тому же кварталу прошлого года.'
+                },
+                forecast: {
+                    title: '🔮 Прогноз на следующий квартал',
+                    description: 'Прогноз выбранной модели для первого квартала без опубликованного значения (наукаст). Модель прогнозирует темп роста г/г, уровень = уровень год назад × (1 + темп роста).',
+                    example: 'В плашке — прогнозный темп роста к тому же кварталу прошлого года.'
+                },
+                change: {
+                    title: '📈 Изменение (год к году)',
+                    description: 'Темп роста последнего фактического квартала к тому же кварталу прошлого года: (текущее / прошлогоднее − 1) × 100%.',
+                    example: '+2.3% — показатель вырос на 2.3% к тому же кварталу прошлого года.'
+                },
+                mae: {
+                    title: '🎯 Точность модели (MAE)',
+                    description: `Среднеквадратичная ошибка прогноза темпа роста г/г на ретроспективных данных (${testPeriodText()}), в п.п., в среднем по горизонтам 1–8 кварталов. Прогнозы строились только по данным, известным на момент прогноза.`,
+                    example: 'MAE = 1.5 — прогноз темпа роста в среднем ошибается на 1.5 п.п. Рядом — MAE наивного прогноза для сравнения.'
+                },
+                annual: {
+                    title: '📅 Прирост за календарный год',
+                    description: 'Оценка темпа роста за текущий календарный год: опубликованные кварталы года берутся по факту, остальные — по прогнозу модели; сумма кварталов делится на сумму кварталов прошлого года.',
+                    example: 'Например, в октябре: I–II кв. — факт, III–IV кв. — прогноз. Так оценка за год есть при любой доступности данных.'
+                },
+                lastdate: {
+                    title: '📅 Дата последнего факта',
+                    description: 'Последний квартал, за который опубликованы данные по показателю. Все кварталы после него — прогноз.',
+                    example: 'Первый прогнозный квартал — наукаст: месячные данные за него уже частично известны.'
+                },
+                model: {
+                    title: '🤖 Модели',
+                    description: 'CatBoost и NGBoost — градиентный бустинг деревьев решений (NGBoost прогнозирует ещё и неопределённость). DFM — динамическая факторная модель: выделяет общие факторы из всех рядов. TabNet — нейросеть для табличных данных. Консенсус — медиана 10 лучших спецификаций; лучшая спецификация — победитель ретроспективы на каждом горизонте.',
+                    example: 'Подробнее — в блоке «Пояснения» под панелью выбора.'
+                },
+                sample: {
+                    title: '📆 Выборка',
+                    description: 'С какого года модель обучается. С 2000 г. — длинная история (больше наблюдений, включает быстрый рост 2000-х и кризис 2008–2009). С 2010 г. — только более близкий к текущему режим экономики, но меньше наблюдений.',
+                    example: 'На ретроспективе 2000 г. чаще лучше для потребления, 2010 г. — для инвестиций.'
+                },
+                varset: {
+                    title: '🧮 Набор переменных',
+                    description: `Короткий (${nVars('short')}): ${varList('short')}. Средний (${nVars('medium')}): короткий + ${DATA.meta.variable_sets.medium.filter(v => !DATA.meta.variable_sets.short.includes(v)).map(v => VARIABLE_NAMES[v] || v).join(', ')}. Полный (${nVars('all')}): все месячные показатели ИЭП.`,
+                    example: 'Больше переменных — не всегда точнее: на коротких рядах модели могут переобучаться.'
+                },
+                ftype: {
+                    title: '🔧 Признаки',
+                    description: 'Классические — темп роста г/г каждого месяца квартала. Скользящие средние — те же темпы роста, сглаженные скользящим средним (меньше шума, но медленнее реагируют).',
+                    example: 'Признаки строятся отдельно по 1-му, 2-му и 3-му месяцу квартала.'
+                },
+            };
+        }
+        let TOOLTIP_DATA = {};
+
+        function buildInfoPanel() {
+            const top = DATA.meta.top_k;
+            document.getElementById('infoGrid').innerHTML = `
+                <div class="info-card"><h4>Модели</h4><dl>
+                    <dt>CatBoost</dt><dd>Градиентный бустинг деревьев решений: последовательно строит деревья, каждое исправляет ошибки предыдущих.</dd>
+                    <dt>NGBoost</dt><dd>Бустинг, который прогнозирует не одно число, а распределение (natural gradient boosting).</dd>
+                    <dt>DFM</dt><dd>Динамическая факторная модель: несколько общих факторов, описывающих динамику всех рядов; работает с пропусками в данных (фильтр Калмана).</dd>
+                    <dt>TabNet</dt><dd>Нейросеть для табличных данных с механизмом внимания: сама выбирает важные признаки на каждом шаге.</dd>
+                </dl></div>
+                <div class="info-card"><h4>Консенсус и интервал</h4>
+                    <p><b>Спецификация</b> — сочетание модели, выборки, набора переменных и типа признаков (всего 4 × 2 × 3 × 2 = 48).</p>
+                    <p><b>Консенсус</b> — для каждого горизонта берутся ${top} спецификаций с наименьшей ошибкой на ретроспективе; прогноз — медиана их прогнозов. Медиана устойчивее одной «лучшей» модели: на 12 кварталах победитель часто случаен.</p>
+                    <p><b>Закрашенная область</b> — диапазон 25–75%: средняя половина из этих ${top} прогнозов (крайние оценки отброшены, чтобы одна-две выбивающиеся модели не расширяли интервал). Это разброс оценок лучших моделей, а не вероятностный доверительный интервал.</p>
+                    <p><b>Лучшая спецификация</b> — одна спецификация с наименьшей ошибкой на ретроспективе, своя на каждом горизонте.</p>
+                </div>
+                <div class="info-card"><h4>Набор переменных и выборка</h4><dl>
+                    <dt>Короткий</dt><dd>${nVars('short')} показателя: ${varList('short')}.</dd>
+                    <dt>Средний</dt><dd>${nVars('medium')} показателей: короткий набор + ${DATA.meta.variable_sets.medium.filter(v => !DATA.meta.variable_sets.short.includes(v)).map(v => VARIABLE_NAMES[v] || v).join(', ')}.</dd>
+                    <dt>Полный</dt><dd>Все ${nVars('all')} месячных показателей ИЭП (производство, торговля, цены, финансы, рынок труда, внешняя торговля).</dd>
+                    <dt>Выборка</dt><dd>Год начала обучения: с 2000 г. (длинная история) или с 2010 г. (ближе к текущему режиму экономики, меньше наблюдений).</dd>
+                    <dt>Признаки</dt><dd>Классические — темпы роста г/г по месяцам квартала; скользящие — те же темпы, сглаженные скользящим средним.</dd>
+                </dl></div>
+                <div class="info-card"><h4>Ретроспектива и доступность данных</h4>
+                    <p><b>Качество прогноза на ретроспективных данных</b> проверяется в псевдореальном времени: для каждого квартала периода ${testPeriodText()} прогноз строится так, как если бы мы находились в прошлом — модель обучается только на данных, известных на тот момент, и прогнозирует на 1–8 кварталов вперёд. Модели переоцениваются раз в 4 квартала.</p>
+                    <p><b>Наивный прогноз</b> — темп роста г/г последнего известного квартала. Модель полезна, если её MAE меньше, чем у наивного (зелёный статус).</p>
+                    <p><b>Доступность данных</b> определяется датой расчёта: в 1-й месяц квартала используется 1 месяц квартальных данных, во 2-й — 2, в 3-й — 3. Метрики показаны для той же доступности.</p>
+                </div>`;
+        }
+
+        function showMetricTooltip(type, el) {
+            const data = TOOLTIP_DATA[type];
+            if (!data) return;
+            const tooltip = document.getElementById('metricTooltip');
+            document.getElementById('ttTitle').textContent = data.title;
+            document.getElementById('ttDesc').textContent = data.description;
+            document.getElementById('ttExample').textContent = data.example;
+            const rect = el.getBoundingClientRect();
+            const tooltipWidth = Math.min(340, window.innerWidth - 40);
+            let left = rect.left + rect.width / 2 - tooltipWidth / 2;
+            let top = rect.bottom + 12;
+            if (left < 10) left = 10;
+            if (left + tooltipWidth > window.innerWidth - 10) left = window.innerWidth - tooltipWidth - 10;
+            if (top + 240 > window.innerHeight) top = Math.max(10, rect.top - 240);
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+            tooltip.style.maxWidth = tooltipWidth + 'px';
+            tooltip.classList.add('visible');
+        }
+        function hideMetricTooltip() {
+            document.getElementById('metricTooltip').classList.remove('visible');
+        }
+
+        // ─── State ─────────────────────────────────────────────────────────────────
+        const state = { target: 'gdp', model: 'consensus', sample: '2000', varset: 'all', ftype: 'classic',
+                        avail: 1, compares: [], view: 'level', horizon: 1, period: '10' };
+        let chartInstance = null;
+        let tableRows = [];
+        let chartRows = [];
+
+        function readControls() {
+            state.target = document.getElementById('indicatorSelect').value;
+            state.model = document.getElementById('modelSelect').value;
+            state.sample = document.getElementById('sampleSelect').value;
+            state.varset = document.getElementById('varsetSelect').value;
+            state.ftype = document.getElementById('ftypeSelect').value;
+            state.period = document.getElementById('periodSelect').value;
+        }
+
+        function specKeyFor(model, s = state) {
+            if (SELECTED_MODELS.includes(model)) return `${model}/${s.avail}`;
+            return `${model}/${s.sample}/${s.varset}/${s.ftype}/${s.avail}`;
+        }
+        function getSpec(model, target = state.target) {
+            return model ? (DATA.targets[target].specs[specKeyFor(model)] || null) : null;
+        }
+        function specDescription(model) {
+            if (model === 'consensus') return `медиана ${DATA.meta.top_k} лучших спецификаций на каждом горизонте`;
+            if (model === 'best') return 'лучшая на ретроспективе спецификация на каждом горизонте';
+            return `с ${state.sample} г. · ${VARSET_NAMES[state.varset]} набор · ${FTYPE_NAMES[state.ftype]} признаки`;
+        }
+        function memberText(spec, h) {
+            const m = spec && spec.members && spec.members[h - 1];
+            if (!m) return '';
+            return m.split(';').map(s => {
+                const [model, start, vs, ft] = s.split('/');
+                return `${MODELS[model].short} · с ${start} г. · ${VARSET_NAMES[vs]} · ${FTYPE_NAMES[ft]}`;
+            }).join('\n');
+        }
+
+        // levels and y/y for history + forecast path of a spec
+        function historyMap(target = state.target) { return new Map(DATA.targets[target].history); }
+        function forecastPath(spec, target = state.target) {
+            if (!spec) return null;
+            const levels = historyMap(target);
+            const out = [];
+            for (let h = 1; h <= DATA.meta.horizon; h++) {
+                const date = addQuarters(DATA.meta.origin, h - 1);
+                const g = spec.future[h - 1];
+                const base = levels.get(addQuarters(date, -4));
+                if (g == null || base == null) { out.push({ date, level: null, yoy: null }); continue; }
+                const level = base * Math.exp(g);
+                levels.set(date, level);
+                const row = { date, level, yoy: pct(g) };
+                const members = spec.member_preds && spec.member_preds[h - 1];
+                if ((members && members.length) || (spec.band && spec.band[h - 1])) {
+                    const [lo, hi] = members && members.length
+                        ? [pct(quantile(members, BAND_Q[0])), pct(quantile(members, BAND_Q[1]))]
+                        : spec.band[h - 1];
+                    row.yoyLo = lo; row.yoyHi = hi;
+                    row.levelLo = base * (1 + lo / 100); row.levelHi = base * (1 + hi / 100);
+                }
+                if (spec.mean && spec.mean[h - 1] != null) {
+                    row.yoyMean = pct(spec.mean[h - 1]);
+                    row.levelMean = base * Math.exp(spec.mean[h - 1]);
+                }
+                out.push(row);
+            }
+            return out;
+        }
+        function historyYoY(target = state.target) {
+            const levels = historyMap(target);
+            return DATA.targets[target].history.map(([d, v]) => {
+                const prev = levels.get(addQuarters(d, -4));
+                return { date: d, level: v, yoy: prev ? (v / prev - 1) * 100 : null };
+            });
+        }
+        function lastFact() {
+            const h = historyYoY();
+            return h[h.length - 1];
+        }
+
+        // ─── Controls init ────────────────────────────────────────────────────────
+        function initControls() {
+            document.getElementById('indicatorSelect').innerHTML = Object.keys(DATA.targets)
+                .map(k => `<option value="${k}" title="${DATA.targets[k].name}">${TARGET_OPTIONS[k] || DATA.targets[k].name}</option>`).join('');
+            const modelOptions = Object.entries(MODELS).map(([k, m]) => `<option value="${k}">${m.option}</option>`).join('');
+            document.getElementById('modelSelect').innerHTML = modelOptions;
+            const panel = document.getElementById('comparePanel');
+            panel.innerHTML = Object.entries(MODELS).map(([k, m]) =>
+                `<label class="opt" data-model="${k}"><input type="checkbox" value="${k}"><span class="swatch" style="background:${COMPARE_COLORS[k]}"></span>${m.option}</label>`
+            ).join('') + '<button type="button" class="clear" id="compareClear">Очистить</button>';
+            panel.querySelectorAll('input').forEach(cb => cb.addEventListener('change', () => {
+                state.compares = [...panel.querySelectorAll('input:checked')].map(x => x.value);
+                update();
+            }));
+            document.getElementById('compareClear').addEventListener('click', () => {
+                panel.querySelectorAll('input').forEach(x => { x.checked = false; });
+                state.compares = [];
+                update();
+            });
+            const multi = document.getElementById('compareSelect');
+            document.getElementById('compareBtn').addEventListener('click', e => { e.stopPropagation(); multi.classList.toggle('open'); });
+            panel.addEventListener('click', e => e.stopPropagation());
+            document.addEventListener('click', () => multi.classList.remove('open'));
+
+            // availability is fixed by the calculation date: month of the quarter = months of data
+            state.avail = DATA.meta.actual_availability;
+            document.getElementById('updateDate').textContent =
+                new Date(DATA.meta.created).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const tests = DATA.test_dates;
+            document.getElementById('testPeriod').textContent = `${qShort(tests[0])} – ${qShort(tests[tests.length - 1])}`;
+
+            ['indicatorSelect', 'modelSelect', 'periodSelect'].forEach(id => document.getElementById(id).addEventListener('change', update));
+            // sample / variable set / features describe a single model: picking one while the consensus
+            // (or the best spec) is shown switches to CatBoost with these settings
+            document.querySelectorAll('.spec-control').forEach(el => {
+                el.insertAdjacentHTML('beforeend', '<span class="hint"></span>');
+                el.querySelector('select').addEventListener('change', () => {
+                    const modelSelect = document.getElementById('modelSelect');
+                    if (SELECTED_MODELS.includes(modelSelect.value)) {
+                        modelSelect.value = 'gb';
+                        showToast('Выборка, набор и признаки задаются для отдельной модели — выбрана CatBoost');
+                    }
+                    update();
+                });
+            });
+            document.querySelectorAll('#viewSeg button').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+        }
+
+        function setView(view) {
+            state.view = view;
+            document.querySelectorAll('#viewSeg button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+            document.getElementById('periodSelect').style.display = view === 'test' ? 'none' : '';
+            update();
+        }
+
+        // ─── Metrics ──────────────────────────────────────────────────────────────
+        function horizonStats(spec, target = state.target) {
+            const naive = DATA.targets[target].naive;
+            const rows = [];
+            for (let h = 1; h <= DATA.meta.horizon; h++) {
+                const m = spec && spec.metrics[h - 1];
+                const n = naive[String(h)];
+                const err = m ? m.mae : null;
+                rows.push({ h, err, naive: n.mae, ratio: err == null ? null : err / n.mae, good: err == null ? null : err < n.mae });
+            }
+            return rows;
+        }
+        function summaryStats(spec) {
+            const stats = horizonStats(spec);
+            const err = mean(stats.map(s => s.err));
+            const naive = mean(stats.map(s => s.naive));
+            return { stats, err, naive, ratio: err == null ? null : err / naive,
+                     better: stats.filter(s => s.good === true).length, known: stats.filter(s => s.good !== null).length };
+        }
+
+        function updateMetricCards(spec, path) {
+            const fact = lastFact();
+            const factCls = fact.yoy >= 0 ? 'positive' : 'negative';
+            document.getElementById('metricCurrent').innerHTML =
+                `${fmt(fact.level / 1000, 2)} <span class="sub">трлн ₽</span> <span class="change ${factCls}">${signed(fact.yoy)}% г/г</span>`;
+            document.getElementById('metricLastDate').textContent = qLong(fact.date);
+
+            const next = path && path[0];
+            document.getElementById('forecastLabel').textContent = `Прогноз (${qLong(DATA.meta.origin)})`;
+            if (next && next.level != null) {
+                const cls = next.yoy >= 0 ? 'positive' : 'negative';
+                document.getElementById('metricForecast').innerHTML =
+                    `${fmt(next.level / 1000, 2)} <span class="sub">трлн ₽</span> <span class="change ${cls}">${signed(next.yoy)}% г/г</span>`;
+            } else {
+                document.getElementById('metricForecast').innerHTML = '— <span class="sub">нет прогноза</span>';
+            }
+            const s = summaryStats(spec);
+            document.getElementById('metricMAECard').innerHTML = s.err == null ? '—'
+                : `${fmt(s.err, 2)} <span class="sub">п.п. · наивный ${fmt(s.naive, 2)}</span>`;
+        }
+
+        function updateModelMetrics(spec) {
+            const s = summaryStats(spec);
+            const cls = s.err == null ? '' : (s.err < s.naive ? 'good' : 'bad');
+            document.getElementById('modelBadge').textContent = MODELS[state.model].short;
+            document.getElementById('specBadge').textContent = specDescription(state.model);
+            const rm = document.getElementById('metricMAE');
+            rm.textContent = fmt(s.err, 2); rm.className = 'value ' + cls;
+            document.getElementById('metricNaive').textContent = fmt(s.naive, 2);
+            const ra = document.getElementById('metricRatio');
+            ra.textContent = s.ratio == null ? '—' : `${fmt(s.ratio * 100, 0)}%`; ra.className = 'value ' + cls;
+            document.getElementById('qualityDot').className = 'quality-dot ' + cls;
+            document.getElementById('qualityIndicator').className = 'quality-indicator ' + cls;
+            document.getElementById('qualityLabel').textContent = s.err == null ? 'Нет данных'
+                : (cls === 'good' ? `Стабильно · лучше наивного на ${s.better} из ${s.known} горизонтов`
+                                  : `Хуже наивного прогноза · лучше лишь на ${s.better} из ${s.known} горизонтов`);
+        }
+
+        function updateHorizonTable(spec) {
+            const rows = horizonStats(spec).map(s => {
+                const date = addQuarters(DATA.meta.origin, s.h - 1);
+                const title = memberText(spec, s.h).replace(/"/g, '');
+                const cls = s.good === null ? '' : (s.good ? 'positive' : 'negative');
+                const dot = s.good === null ? '—' : `<span class="quality-dot ${s.good ? 'good' : 'bad'}"></span>`;
+                return `<tr data-h="${s.h}" class="${s.h === state.horizon && state.view === 'test' ? 'selected' : ''}" title="${title}">
+                    <td class="h-cell">h = ${s.h}<small>прогноз на ${qShort(date)}</small></td>
+                    <td class="${cls}">${fmt(s.err, 2)}</td>
+                    <td class="naive-value">${fmt(s.naive, 2)}</td>
+                    <td class="${cls}">${s.ratio == null ? '—' : fmt(s.ratio * 100, 0) + '%'}</td>
+                    <td>${dot}</td>
+                </tr>`;
+            }).join('');
+            const body = document.getElementById('horizonBody');
+            body.innerHTML = rows;
+            body.querySelectorAll('tr').forEach(tr => tr.addEventListener('click', () => {
+                state.horizon = +tr.dataset.h;
+                setView('test');
+            }));
+        }
+
+        // ─── Chart ────────────────────────────────────────────────────────────────
+        function lineDataset(label, data, color, extra = {}) {
+            return { label, data, borderColor: color, backgroundColor: color, borderWidth: 2.5, pointRadius: 2.5,
+                     pointBackgroundColor: color, tension: 0.3, spanGaps: false, ...extra };
+        }
+
+        function buildSeriesChart(spec, path, compares) {
+            const isLevel = state.view === 'level';
+            const value = r => r == null ? null : (isLevel ? (r.level == null ? null : r.level / 1000) : r.yoy);
+            let history = historyYoY();
+            if (state.period !== 'all') {
+                const from = addQuarters(DATA.meta.origin, -4 * +state.period);
+                history = history.filter(r => r.date >= from);
+            }
+            if (!isLevel) history = history.filter(r => r.yoy != null);
+            const dates = [...history.map(r => r.date), ...(path || []).map(r => r.date)];
+            const labels = dates.map(qShort);
+            const nh = history.length;
+            const last = history[nh - 1];
+            const anchored = p => [...Array(nh - 1).fill(null), value(last), ...(p || []).map(value)];
+
+            const datasets = [lineDataset('Факт', [...history.map(value), ...(path || []).map(() => null)], COLORS.fact)];
+            let lo = [], hi = [];
+            if (path) {
+                datasets.push(lineDataset(`Прогноз — ${MODELS[state.model].name}`, anchored(path), COLORS.forecast,
+                    { borderDash: [6, 4], pointRadius: 3.5, pointBorderColor: '#fff', pointBorderWidth: 1.5 }));
+                if (path.some(r => r.yoyLo != null)) {
+                    lo = path.map(r => r.yoyLo == null ? null : (isLevel ? r.levelLo / 1000 : r.yoyLo));
+                    hi = path.map(r => r.yoyHi == null ? null : (isLevel ? r.levelHi / 1000 : r.yoyHi));
+                    const pad = Array(nh).fill(null);
+                    datasets.push(lineDataset('Диапазон (мин.)', [...pad, ...lo], 'rgba(245,158,11,0)', { pointRadius: 0, borderWidth: 0 }));
+                    datasets.push(lineDataset(BAND_NAME, [...pad, ...hi], 'rgba(245,158,11,0)',
+                        { pointRadius: 0, borderWidth: 0, fill: '-1', backgroundColor: 'rgba(245,158,11,0.14)' }));
+                }
+            }
+            compares.forEach(c => datasets.push(lineDataset(`Сравнение — ${MODELS[c.model].name}`, anchored(c.path), COMPARE_COLORS[c.model],
+                { borderDash: [3, 3], borderWidth: 2, pointRadius: 2 })));
+            const unitName = isLevel ? 'Уровень, трлн ₽' : 'Темп роста г/г, %';
+            chartRows = [
+                ...history.map(r => ({ 'Период': qShort(r.date), 'Тип': 'факт', [unitName]: round(value(r)) })),
+                ...(path || []).map((r, i) => ({
+                    'Период': qShort(r.date), 'Тип': 'прогноз', [unitName]: round(value(r)),
+                    ...(lo.length ? { 'Топ-10, 25%': round(lo[i]), 'Топ-10, 75%': round(hi[i]) } : {}),
+                    ...Object.fromEntries(compares.map(c => [`Сравнение (${MODELS[c.model].short})`, round(value(c.path[i]))])),
+                })),
+            ];
+            return { labels, datasets, forecastStart: nh, unit: isLevel ? 'трлн ₽ (цены 2021 г.)' : 'темп роста г/г, %' };
+        }
+
+        function buildTestChart(spec, compares) {
+            const t = DATA.targets[state.target];
+            const h = state.horizon;
+            const labels = DATA.test_dates.map(qShort);
+            const toPct = arr => arr.map(pct);
+            const fact = toPct(t.test_fact), naive = toPct(t.naive[String(h)].pred);
+            const pred = spec ? toPct(spec.test[h - 1]) : null;
+            const cmps = compares.map(c => ({ model: c.model, pred: toPct(c.spec.test[h - 1]) }));
+            const datasets = [lineDataset('Факт', fact, COLORS.fact)];
+            if (pred) datasets.push(lineDataset(`Исторический прогноз за ${h} кв. — ${MODELS[state.model].name}`, pred, COLORS.forecast,
+                { borderDash: [6, 4], pointRadius: 3.5, pointBorderColor: '#fff', pointBorderWidth: 1.5 }));
+            datasets.push(lineDataset('Наивный прогноз', naive, COLORS.naive, { borderDash: [2, 3], borderWidth: 2, pointRadius: 2 }));
+            cmps.forEach(c => datasets.push(lineDataset(`Сравнение — ${MODELS[c.model].name}`, c.pred, COMPARE_COLORS[c.model], { borderDash: [3, 3], borderWidth: 2, pointRadius: 2 })));
+            chartRows = DATA.test_dates.map((d, i) => ({
+                'Целевой квартал': qShort(d), 'Прогноз сделан в': qShort(addQuarters(d, -(h - 1))), 'Горизонт': h,
+                'Факт г/г, %': round(fact[i]), 'Прогноз модели г/г, %': pred ? round(pred[i]) : null,
+                'Ошибка модели, п.п.': pred && pred[i] != null ? round(pred[i] - fact[i]) : null,
+                'Наивный г/г, %': round(naive[i]), 'Ошибка наивного, п.п.': round(naive[i] - fact[i]),
+                ...Object.fromEntries(cmps.map(c => [`Сравнение (${MODELS[c.model].short}) г/г, %`, round(c.pred[i])])),
+            }));
+            return { labels, datasets, forecastStart: -1, unit: 'темп роста г/г, %' };
+        }
+
+        function renderChart(cfg) {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            const forecastStartIndex = cfg.forecastStart;
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { labels: cfg.labels, datasets: cfg.datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            display: true, position: 'top',
+                            labels: { usePointStyle: true, padding: 20, font: { size: 12, weight: '500' },
+                                      filter: item => !item.text.includes('(мин.)') }
+                        },
+                        tooltip: {
+                            filter: item => !item.dataset.label.includes('(мин.)'),
+                            callbacks: {
+                                label: function (context) {
+                                    const value = context.parsed.y;
+                                    if (value === null || value === undefined) return '';
+                                    if (context.dataset.label === BAND_NAME) {
+                                        const lo = context.chart.data.datasets[context.datasetIndex - 1].data[context.dataIndex];
+                                        return `${context.dataset.label}: ${fmt(lo, 2)} … ${fmt(value, 2)}`;
+                                    }
+                                    return `${context.dataset.label}: ${value.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { maxTicksLimit: 20, font: { size: 10 } } },
+                        y: {
+                            grid: { color: 'rgba(0,0,0,0.04)' },
+                            ticks: { font: { size: 11 } },
+                            title: { display: true, text: cfg.unit, font: { size: 11, weight: '500' } }
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'verticalLine',
+                    beforeDraw: function (chart) {
+                        if (forecastStartIndex < 0 || forecastStartIndex >= chart.data.labels.length) return;
+                        const xScale = chart.scales.x, yScale = chart.scales.y;
+                        const x = xScale.getPixelForValue(forecastStartIndex - 0.5);
+                        if (x < xScale.left || x > xScale.right) return;
+                        const c = chart.ctx;
+                        c.save();
+                        c.beginPath();
+                        c.setLineDash([4, 4]);
+                        c.strokeStyle = 'rgba(0,0,0,0.15)';
+                        c.lineWidth = 1.5;
+                        c.moveTo(x, yScale.top);
+                        c.lineTo(x, yScale.bottom);
+                        c.stroke();
+                        c.restore();
+                        c.save();
+                        c.fillStyle = 'rgba(0,0,0,0.25)';
+                        c.font = '9px Inter, sans-serif';
+                        c.textAlign = 'center';
+                        c.fillText('прогноз →', x, yScale.top + 14);
+                        c.restore();
+                    }
+                }]
+            });
+        }
+
+        // ─── Table ────────────────────────────────────────────────────────────────
+        function updateTable(path) {
+            const history = historyYoY().slice(-4);
+            tableRows = [
+                ...history.map(r => ({ ...r, type: 'факт' })),
+                ...(path || []).map(r => ({ ...r, type: 'прогноз' })),
+            ];
+            const showBand = path && path.some(r => r.yoyLo != null);
+            document.getElementById('tableHead').innerHTML = `<tr><th>Период</th><th>Уровень, трлн ₽</th><th>Темп роста г/г, %</th>
+                ${showBand ? `<th>Среднее топ-${DATA.meta.top_k}, %</th><th>Диапазон 25–75%, %</th>` : ''}
+<th>Тип</th></tr>`;
+            document.getElementById('tableBody').innerHTML = tableRows.slice().reverse().map(r => {
+                const badge = r.type === 'прогноз' ? '<span class="forecast-badge">прогноз</span>' : '<span class="actual-badge">факт</span>';
+                return `<tr>
+                    <td>${qLong(r.date)}</td>
+                    <td><strong>${r.level == null ? '—' : fmt(r.level / 1000, 2)}</strong></td>
+                    <td>${signed(r.yoy)}</td>
+                    ${showBand ? `<td>${r.yoyMean == null ? '' : signed(r.yoyMean)}</td><td>${r.yoyLo == null ? '' : `${fmt(r.yoyLo)} … ${fmt(r.yoyHi)}`}</td>` : ''}
+                    <td>${badge}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ─── Calendar-year growth ─────────────────────────────────────────────────
+        // For every year that is complete in fact + forecast: sum of the 4 quarterly levels divided by the
+        // sum of the previous year. Published quarters are facts, the rest come from the forecast path.
+        function annualEstimates(path) {
+            const facts = historyMap();
+            const fc = new Map((path || []).filter(r => r.level != null).map(r => [r.date, r]));
+            const lastFactYear = +DATA.targets[state.target].history.slice(-1)[0][0].slice(0, 4);
+            const lastYear = path && path.length ? +path[path.length - 1].date.slice(0, 4) : lastFactYear;
+            const quarters = y => [0, 1, 2, 3].map(q => `${y}-${String(q * 3 + 1).padStart(2, '0')}-01`);
+            const central = d => facts.has(d) ? facts.get(d) : (fc.has(d) ? fc.get(d).level : null);
+            const rows = [];
+            for (let y = lastFactYear - 1; y <= lastYear; y++) {
+                const qs = quarters(y), prev = quarters(y - 1).map(central);
+                if (prev.some(v => v == null) || qs.some(d => central(d) == null)) continue;
+                const prevSum = prev.reduce((a, b) => a + b, 0);
+                const pick = key => qs.reduce((a, d) => a + (facts.has(d) ? facts.get(d) : (fc.get(d)[key] ?? fc.get(d).level)), 0);
+                const isFc = qs.map(d => !facts.has(d));
+                const hasBand = qs.some(d => fc.has(d) && fc.get(d).levelLo != null);
+                const hasMean = qs.some(d => fc.has(d) && fc.get(d).levelMean != null);
+                const roman = flags => qs.map((d, i) => flags[i] ? ROMAN[i] : null).filter(Boolean).join(', ');
+                rows.push({
+                    year: y,
+                    growth: (pick('level') / prevSum - 1) * 100,
+                    mean: hasMean ? (pick('levelMean') / prevSum - 1) * 100 : null,
+                    lo: hasBand ? (pick('levelLo') / prevSum - 1) * 100 : null,
+                    hi: hasBand ? (pick('levelHi') / prevSum - 1) * 100 : null,
+                    factQ: roman(isFc.map(f => !f)), fcQ: roman(isFc),
+                    isFact: isFc.every(f => !f),
+                });
+            }
+            const lastFull = rows.filter(r => r.isFact).pop();  // one fully published year for reference
+            return rows.filter(r => !r.isFact || r === lastFull);
+        }
+
+        function updateAnnual(path) {
+            const rows = annualEstimates(path);
+            const isConsensus = state.model === 'consensus';
+            const showBand = isConsensus && rows.some(r => r.lo != null);
+            document.getElementById('annualHead').innerHTML = `<tr><th>Год</th><th>Темп роста, %</th>
+                ${showBand ? `<th>Среднее топ-${DATA.meta.top_k}, %</th><th>Диапазон 25–75%, %</th>` : ''}
+                <th>Кварталы: факт</th><th>Кварталы: прогноз</th></tr>`;
+            document.getElementById('annualBody').innerHTML = rows.map(r => `<tr>
+                    <td><strong>${r.year}</strong></td>
+                    <td class="num ${r.growth >= 0 ? 'positive' : 'negative'}">${signed(r.growth)}</td>
+                    ${showBand ? `<td>${r.mean == null ? '—' : signed(r.mean)}</td><td>${r.lo == null ? '—' : `${fmt(r.lo)} … ${fmt(r.hi)}`}</td>` : ''}
+                    <td class="muted">${r.factQ || '—'}</td>
+                    <td class="muted">${r.fcQ ? r.fcQ + ' кв.' : '— (факт)'}</td>
+                </tr>`).join('');
+            document.getElementById('annualFoot').textContent = showBand
+                ? `Темп роста консенсуса — по медиане ${DATA.meta.top_k} лучших спецификаций в каждом квартале; среднее — по их среднему. `
+                  + `Диапазон 25–75% — если бы все прогнозные кварталы года оказались на нижней (верхней) границе квартального диапазона 25–75% прогнозов ${DATA.meta.top_k} лучших спецификаций.`
+                : 'Опубликованные кварталы — факт, остальные — прогноз выбранной модели.';
+
+            const current = rows.find(r => r.fcQ);
+            if (current) {
+                document.getElementById('annualLabel').textContent = `Прирост за ${current.year} г. (оценка)`;
+                const cls = current.growth >= 0 ? 'positive' : 'negative';
+                document.getElementById('metricAnnual').innerHTML =
+                    `<span class="change ${cls}">${signed(current.growth)}%</span><span class="sub">факт: ${current.factQ || '—'} кв.</span>`;
+            } else {
+                document.getElementById('metricAnnual').textContent = '—';
+            }
+        }
+
+        // ─── Main update ──────────────────────────────────────────────────────────
+        function update() {
+            readControls();
+            const isSelection = SELECTED_MODELS.includes(state.model);
+            document.querySelectorAll('.spec-control .hint').forEach(el => {
+                el.textContent = isSelection ? 'консенсус: подбор авто' : '';
+            });
+
+            const spec = getSpec(state.model);
+            const path = forecastPath(spec);
+            const compares = state.compares.filter(m => m !== state.model)
+                .map(m => ({ model: m, spec: getSpec(m) })).filter(c => c.spec)
+                .map(c => ({ ...c, path: forecastPath(c.spec) }));
+            document.querySelectorAll('#comparePanel label.opt').forEach(l => {
+                const off = l.dataset.model === state.model;
+                l.classList.toggle('off', off);
+                l.querySelector('input').disabled = off;
+            });
+            const nCmp = compares.length;
+            document.getElementById('compareBtn').textContent = nCmp === 0 ? 'Не сравнивать'
+                : nCmp === 1 ? MODELS[compares[0].model].option : `Выбрано моделей: ${nCmp}`;
+            const t = DATA.targets[state.target];
+
+            updateMetricCards(spec, path);
+            updateModelMetrics(spec);
+            updateHorizonTable(spec);
+            updateTable(path);
+            updateAnnual(path);
+
+            const titles = {
+                level: 'факт + прогноз на 2 года, уровни',
+                yoy: 'факт + прогноз на 2 года, темп роста к тому же кварталу прошлого года',
+                test: `качество прогноза на ретроспективных данных: прогнозы за ${state.horizon} кв. до целевого квартала`,
+            };
+            document.getElementById('chartTitle').innerHTML = `${t.name} <span>${titles[state.view]}</span>`;
+            const cfg = state.view === 'test' ? buildTestChart(spec, compares) : buildSeriesChart(spec, path, compares);
+            renderChart(cfg);
+
+            let note;
+            if (state.view === 'test') {
+                const h = state.horizon;
+                note = `Как читать: каждая оранжевая точка — прогноз, который модель дала бы за ${h} кв. до целевого квартала `
+                     + `(${h === 1 ? 'наукаст: прогноз текущего квартала' : `например, точка ${qShort(DATA.test_dates[0])} сделана в ${qShort(addQuarters(DATA.test_dates[0], -(h - 1)))}`}), `
+                     + `обучаясь только на данных, опубликованных к тому моменту. `
+                     + `Синяя линия — фактический темп роста, серая — наивный прогноз (последний известный темп роста). `
+                     + `Чем ближе оранжевая линия к синей и чем дальше серая, тем полезнее модель. Другой горизонт — нажмите на строку справа.`;
+            } else {
+                note = `Прогноз от ${qLong(DATA.meta.origin)} — первого квартала без опубликованного значения. `;
+                if (state.model === 'consensus') note += `Консенсус — медиана ${DATA.meta.top_k} спецификаций с наименьшей ошибкой на ретроспективе; закрашено — диапазон 25–75% их прогнозов (средняя половина, без крайних оценок), а не вероятностный интервал. Наведите на строку горизонта справа, чтобы увидеть состав.`;
+                if (state.model === 'best') note += 'Лучшая спецификация выбирается отдельно для каждого горизонта; наведите на строку горизонта справа, чтобы увидеть её.';
+            }
+            if (!spec) note += ' Для выбранной комбинации нет результатов.';
+            document.getElementById('chartNote').textContent = note;
+        }
+
+        // ─── URL parameters: #target=inv&model=gb&view=test&h=4 ─────────────────
+        function applyHash() {
+            const params = new URLSearchParams(location.hash.slice(1));
+            const ids = { target: 'indicatorSelect', model: 'modelSelect', sample: 'sampleSelect', varset: 'varsetSelect',
+                          ftype: 'ftypeSelect', period: 'periodSelect' };
+            Object.entries(ids).forEach(([k, id]) => { if (params.has(k)) document.getElementById(id).value = params.get(k); });
+            if (params.has('h')) state.horizon = +params.get('h');
+            if (params.has('compare')) {
+                state.compares = params.get('compare').split(',').filter(m => MODELS[m]);
+                document.querySelectorAll('#comparePanel input').forEach(cb => { cb.checked = state.compares.includes(cb.value); });
+            }
+            if (params.has('view')) setView(params.get('view'));
+        }
+
+        // ─── Export ───────────────────────────────────────────────────────────────
+        function download(blob, name) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = name;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportCSV() {
+            if (!chartRows.length) return;
+            const cols = [...new Set(chartRows.flatMap(r => Object.keys(r)))];
+            const esc = v => v == null ? '' : String(v).includes(';') ? `"${v}"` : String(v);
+            const csv = [cols.join(';'), ...chartRows.map(r => cols.map(c => esc(r[c])).join(';'))].join('\n');
+            download(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }), `${state.target}_${state.model}_${state.view}.csv`);
+            showToast('CSV скачан (данные текущего графика)');
+        }
+
+        function specRows(target, onlyAvail = true) {
+            const rows = { forecasts: [], metrics: [] };
+            Object.entries(DATA.targets[target].specs).forEach(([key, spec]) => {
+                const parts = key.split('/');
+                const avail = +parts[parts.length - 1];
+                if (onlyAvail && avail !== state.avail) return;
+                const isSel = SELECTED_MODELS.includes(parts[0]);
+                const base = {
+                    'Показатель': TARGET_OPTIONS[target], 'Модель': MODELS[parts[0]].option,
+                    'Выборка': isSel ? '' : `с ${parts[1]} г.`, 'Набор переменных': isSel ? '' : VARSET_NAMES[parts[2]],
+                    'Признаки': isSel ? '' : FTYPE_NAMES[parts[3]], 'Доступность, мес.': avail,
+                };
+                const path = forecastPath(spec, target) || [];
+                path.forEach((r, i) => rows.forecasts.push({
+                    ...base, 'Горизонт': i + 1, 'Квартал': qShort(r.date),
+                    'Уровень, трлн ₽': r.level == null ? null : round(r.level / 1000), 'Темп роста г/г, %': round(r.yoy),
+                    ...(r.yoyLo != null ? { 'Топ-10, 25%': round(r.yoyLo), 'Топ-10, 75%': round(r.yoyHi) } : {}),
+                }));
+                horizonStats(spec, target).forEach(s => rows.metrics.push({
+                    ...base, 'Горизонт': s.h, 'MAE модели, п.п.': round(s.err), 'MAE наивного, п.п.': round(s.naive),
+                    'Модель / наивный': round(s.ratio), 'Статус': s.good === null ? '' : (s.good ? 'лучше наивного' : 'хуже наивного'),
+                }));
+            });
+            return rows;
+        }
+
+        function exportExcel() {
+            if (typeof XLSX === 'undefined') { showToast('Excel недоступен без интернета — используйте CSV'); return; }
+            const wb = XLSX.utils.book_new();
+            const add = (rows, name) => { if (rows.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), name); };
+            const spec = getSpec(state.model);
+            // 1. current selection: history + forecast
+            add(tableRows.map(r => ({
+                'Квартал': qShort(r.date), 'Тип': r.type, 'Уровень, трлн ₽': r.level == null ? null : round(r.level / 1000),
+                'Темп роста г/г, %': round(r.yoy), 'Среднее топ-10, %': round(r.yoyMean), 'Топ-10, 25%': round(r.yoyLo), 'Топ-10, 75%': round(r.yoyHi),
+            })), 'Выбранный прогноз');
+            // 2. quality by horizon of the current selection
+            add(horizonStats(spec).map(s => ({
+                'Горизонт': s.h, 'Прогнозный квартал': qShort(addQuarters(DATA.meta.origin, s.h - 1)), 'MAE модели, п.п.': round(s.err),
+                'MAE наивного, п.п.': round(s.naive), 'Модель / наивный': round(s.ratio),
+                'Статус': s.good === null ? '' : (s.good ? 'лучше наивного' : 'хуже наивного'),
+                'Состав (консенсус / лучшая)': memberText(spec, s.h).replace(/\n/g, '; '),
+            })), 'Качество по горизонтам');
+            // 3. historical forecasts of the current selection for every horizon
+            const t = DATA.targets[state.target];
+            const retro = [];
+            for (let h = 1; h <= DATA.meta.horizon; h++) {
+                DATA.test_dates.forEach((d, i) => retro.push({
+                    'Горизонт': h, 'Целевой квартал': qShort(d), 'Прогноз сделан в': qShort(addQuarters(d, -(h - 1))),
+                    'Факт г/г, %': round(pct(t.test_fact[i])), 'Прогноз модели г/г, %': spec ? round(pct(spec.test[h - 1][i])) : null,
+                    'Наивный г/г, %': round(pct(t.naive[String(h)].pred[i])),
+                }));
+            }
+            add(retro, 'Ретроспектива');
+            add(annualEstimates(forecastPath(spec)).map(r => ({
+                'Год': r.year, 'Темп роста за год, %': round(r.growth, 2),
+                'Среднее топ-10, %': round(r.mean, 2), 'Топ-10, 25%': round(r.lo, 2), 'Топ-10, 75%': round(r.hi, 2),
+                'Факт': r.factQ, 'Прогноз': r.fcQ,
+            })), 'Годовые оценки');
+            // 4-5. every model and specification for every indicator
+            const all = Object.keys(DATA.targets).map(k => specRows(k));
+            add(all.flatMap(r => r.forecasts), 'Все прогнозы');
+            add(all.flatMap(r => r.metrics), 'Все метрики');
+            XLSX.writeFile(wb, `macro_forecast_${DATA.meta.run_id}.xlsx`);
+            showToast('Excel скачан');
+        }
+
+        function exportChart() {
+            const link = document.createElement('a');
+            link.download = `${state.target}_${state.view}_chart.png`;
+            link.href = document.getElementById('mainChart').toDataURL('image/png');
+            link.click();
+            showToast('PNG скачан');
+        }
+
+        // ─── Init ─────────────────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!DATA) {
+                document.querySelector('.container').innerHTML = '<div class="empty-note">Нет данных: соберите страницу командой python -m pipelines.build_dashboard</div>';
+                return;
+            }
+            TOOLTIP_DATA = buildTooltips();
+            buildInfoPanel();
+            document.querySelectorAll('[data-tooltip]').forEach(el => {
+                const type = el.dataset.tooltip;
+                el.addEventListener('mouseenter', () => showMetricTooltip(type, el));
+                el.addEventListener('mouseleave', hideMetricTooltip);
+            });
+            initControls();
+            applyHash();
+            update();
+        });
+    </script>
+
+</body>
+</html>

@@ -42,7 +42,8 @@ def run_main_tabnet() -> None:
                         target_name=target,
                         horizon=horizon,
                         avail_features_full=avail_features_full,
-                        params=params,
+                        # copy: fit() overwrites max_epochs, a shared dict leaked it to the next model
+                        params=dict(params),
                     )
 
                     tabnet.fit(train, valid)

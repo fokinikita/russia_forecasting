@@ -4,7 +4,7 @@ import attrs
 import polars as pl
 
 import config
-from eng_ru_names_dict import chain_indeces, eng_ru_quarterly_dict
+from eng_ru_names_dict import chain_indeces, eng_ru_quarterly_dict, yoy_indeces
 from preprocess_data.gigadata_parser import parse_giga_data
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
@@ -85,9 +85,15 @@ class FeaturesService:
 
     @staticmethod
     def _convert_indeces_to_basics(
-        giga_data: pl.DataFrame, chain_indeces: list
+        giga_data: pl.DataFrame, chain_indeces: list, yoy_indeces: list = ()
     ) -> pl.DataFrame:
+        from data_iep.transform import chain_yoy_to_index
+
         giga_data = giga_data.sort("datem")
+
+        # y/y rates: I_t = I_{t-12} * x_t / 100 (giga_data is on a full monthly grid)
+        for column in yoy_indeces:
+            giga_data = giga_data.with_columns(chain_yoy_to_index(giga_data[column], 12))
 
         for column in chain_indeces:
             chain_series = giga_data[column]
@@ -200,10 +206,40 @@ class FeaturesService:
         quarterly_data = quarterly_data_raw.with_columns(quarterly_transform_expr)
         return quarterly_data
 
+    @staticmethod
+    def _read_iep_data() -> tuple[pl.DataFrame, pl.DataFrame]:
+        """Monthly + quarterly data collected by data_iep (already converted to basic indices)."""
+        from data_iep.pipeline import IepDataPipeline, load_iep_data
+
+        try:
+            iep_data = load_iep_data(config.IEP_DATA_DIR)
+        except FileNotFoundError:
+            logger.info("No saved IEP data, downloading it from data.iep.ru")
+            iep_data = IepDataPipeline(output_dir=config.IEP_DATA_DIR).run()
+
+        monthly_data = iep_data["monthly"].rename({"date": "datem"}).sort("datem")
+        quarterly_data_raw = (
+            iep_data["quarterly"]
+            .rename({"date": "dateq"})
+            .select(["dateq", *eng_ru_quarterly_dict.keys()])
+            .with_columns(
+                pl.col("dateq").dt.quarter().alias("quarter"),
+                pl.col("dateq").dt.year().alias("year"),
+            )
+            .sort("dateq")
+        )
+        return monthly_data, quarterly_data_raw
+
     def get_features(self) -> tuple[pl.DataFrame, pl.DataFrame]:
+        if config.DATA_SOURCE == "iep":
+            joined_monthly_data, quarterly_data_raw = self._read_iep_data()
+            monthly_features = self._get_features_monthly(joined_monthly_data)
+            quarterly_data = self._prepare_quarterly_data(quarterly_data_raw)
+            return monthly_features, quarterly_data
+
         cbr_data_raw, fred_data_raw, quarterly_data_raw = self._read_monthly_data()
         giga_data = self._parse_giga_data()
-        giga_data = self._convert_indeces_to_basics(giga_data, chain_indeces)
+        giga_data = self._convert_indeces_to_basics(giga_data, chain_indeces, yoy_indeces)
         joined_monthly_data = self._join_monhtly_data(
             giga_data, fred_data_raw, cbr_data_raw
         )

@@ -105,7 +105,8 @@ class TabNetModel:
                 patience=self.params.get("early_stopping_rounds", 20),
                 batch_size=self.params.get("batch_size", 8),
                 virtual_batch_size=self.params.get("virtual_batch_size", 8),
-                drop_last=False,
+                # a last batch of 1 row breaks batch norm -> drop it only in that case
+                drop_last=len(X_train) % self.params.get("batch_size", 8) == 1,
             )
 
             best_epoch = np.argmin(self.model.history["valid_rmse"]) + 1
@@ -124,7 +125,8 @@ class TabNetModel:
                 max_epochs=self.params.get("max_epochs", 200),
                 batch_size=self.params.get("batch_size", 8),
                 virtual_batch_size=self.params.get("virtual_batch_size", 8),
-                drop_last=False,
+                # a last batch of 1 row breaks batch norm -> drop it only in that case
+                drop_last=len(X_train) % self.params.get("batch_size", 8) == 1,
             )
 
     def predict(self, test: pl.DataFrame) -> pl.DataFrame:

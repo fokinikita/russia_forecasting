@@ -94,15 +94,19 @@ def parse_giga_data(filename: str) -> list[pl.DataFrame]:
                     result_long, index="date", columns="indicator", values="value"
                 )
 
+                # built from numpy on purpose: pl.DataFrame(pandas_df) needs a working pyarrow
+                parsed_list = parsed_list.reset_index()
                 parsed_list_polars = pl.DataFrame(
-                    parsed_list.reset_index()
+                    {col: parsed_list[col].to_numpy() for col in parsed_list.columns}
                 ).with_columns(pl.col("date").cast(pl.Date).alias("date"))
 
             parsed_result.append(parsed_list_polars)
             # logger.info(f'List {sheet_name} was succesfully parsed')
         except Exception as e:
-            pass
-            # logger.info(f'List {sheet_name} was not parsed')
-            # logger.error(f'ERROR message: {e}')
+            logger.warning(f"Sheet {sheet_name!r} was not parsed: {type(e).__name__}: {e}")
 
+    if not parsed_result:
+        raise ValueError(
+            f"No sheet of {filename} could be parsed - see the warnings above for the reason"
+        )
     return parsed_result

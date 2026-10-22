@@ -42,6 +42,85 @@
 
 ---
 
+## Автоматический сбор данных (data.iep.ru)
+
+Ветка `main_auto_pipeline`: все переменные (те же 4 квартальных + 63 месячных) скачиваются
+с data.iep.ru, всегда из **последнего** релиза (vintage) каждого датасета.
+
+```bash
+python -m data_iep.pipeline   # скачать + преобразовать, сохраняет в data/iep/
+```
+
+Затем в `config.py` поставить `DATA_SOURCE = "iep"` - и `main.py` будет обучаться на новых данных
+(по умолчанию `"manual"` - старые excel-файлы, поведение не меняется).
+
+```text
+data_iep/
+├── client.py         # HTTP-клиент API: dataset uuid -> последний vintage -> линии -> наблюдения
+├── series_config.py  # реестр рядов: переменная -> датасет + измерения + тип преобразования
+├── collectors.py     # QuarterlyCollector / MonthlyCollector / DailyCollector -> 3 датафрейма
+├── transform.py      # цепные индексы -> базисные, склейка ВВП по базовым годам, daily -> monthly
+└── pipeline.py       # сбор + преобразование + сохранение
+```
+
+Как устроен API:
+1. `GET /analytic/api/v1/search/datasets/family/{uuid}` -> `vintage_id` последнего релиза
+2. `GET /analytic/api/v1/vintage/lines_list?vintage_id=...` -> все ряды датасета с готовыми `selector`
+3. `POST /analytic/api/v1/vintage/line` c `selector` -> наблюдения (нужен заголовок `Accept-Language`)
+
+Сравнение старых и новых данных: `compare_old_vs_iep.ipynb`.
+
+## Прогнозирование в реальном времени (данные IEP)
+
+Полный цикл: обновить данные -> бэктест последних 3 лет -> метрики -> прогноз на 2 года вперед.
+
+```bash
+python -m pipelines.run_realtime                    # всё сразу (~4-5 часов на 8 ядрах)
+python -m pipelines.run_realtime --no-refresh       # без скачивания данных
+python -m pipelines.run_realtime --models gb dfm    # только часть моделей
+python -m pipelines.run_realtime --only future      # только прогноз в будущее
+```
+
+Результаты смотреть в `realtime_results.ipynb`.
+
+Дашборд: `dashboard/macro_dashboard.html` (открывается двойным кликом, без сервера). Пересобирается автоматически
+после `run_realtime`, вручную — `python -m pipelines.build_dashboard` (`--run-id`, `--as-of 2026-11-15`).
+Доступность данных по умолчанию берётся из календаря: 1-й месяц квартала → 1, 2-й → 2, 3-й → 3.
+Макет страницы — `dashboard/template.html`. Ссылки на конкретный вид: `macro_dashboard.html#target=inv&model=gb&view=test&h=4`.
+
+**Как устроен бэктест (псевдо real-time).** Тест = последние 12 кварталов с известным ВВП, горизонты
+1-8 кварталов (h=1 - наукаст текущего квартала). Прогноз квартала t на горизонте h делается из точки
+T = t - h + 1 моделью, оцененной только на данных, известных до T (расширяющееся окно, переоценка
+каждые `RT_REFIT_EVERY` кварталов). Признаки: месячные данные квартала T (месяц `availability`) и
+последнее известное значение целевой переменной.
+
+**Сетка** (все параметры в `config.py`, блок `RT_*`): модели GB / NGB / TabNet / DFM x начало
+обучения 2000 / 2010 x набор переменных short / medium / all x признаки classic (d12) / rolling x
+доступность 1-3 месяца квартала x 4 целевые переменные x 8 горизонтов.
+
+| набор | переменные |
+|---|---|
+| short | brent, retail_real, miacr, ipi |
+| medium | short + reer, ex_usd, im_usd, un, comm_freight |
+| all | все 61 месячная переменная |
+
+```text
+forecasting/
+├── dataset.py     # квартальная таблица: цели (log d4) + месячные признаки по месяцам квартала
+├── design.py      # прямой многошаговый дизайн X(T) -> y(T+h-1)
+├── models.py      # GB / NGB / TabNet: единый интерфейс, early stopping + refit
+├── dfm.py         # DynamicFactorMQ: все цели и горизонты сразу, без заглядывания в будущее
+├── experiment.py  # сетка спецификаций, план бэктеста, параллельный запуск с чекпойнтами
+├── evaluation.py  # RMSE / MAE / bias, относительно наивного прогноза, rolling-метрики
+├── pipeline.py    # весь цикл + сохранение результатов
+└── report.py      # чтение результатов запуска
+```
+
+Результаты: `results/runs/<дата>/backtest` (metrics, ranking, best, rolling, errors) и
+`results/runs/<дата>/future` (все прогнозы и прогноз лучшей спецификации). Каждый запуск
+дописывает `results/metrics_history.csv` и `results/forecasts_history.csv` - так видно,
+как меняется качество и прогнозы с приходом новых данных.
+
 ## Структура проекта
 
 ```text

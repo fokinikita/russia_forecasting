@@ -1,4 +1,4 @@
-from typing import Final
+from typing import Final, Optional
 
 # Common params
 RANDOM_SEED: Final[int] = 228
@@ -45,3 +45,34 @@ GIGA_DATA_PATH: Final[str] = "data/giga_data_ready_07_2025.xlsx"
 FRED_DATA_PATH: Final[str] = "data/fred_data.xlsx"
 CBR_DATA_PATH: Final[str] = "data/cbr_data.xlsx"
 QUARTERLY_DATA_PATH: Final[str] = "data/quarterly_data.xlsx"
+
+# data source for FeaturesService: "manual" (excel files above) or "iep" (data.iep.ru)
+DATA_SOURCE: Final[str] = "manual"
+# where data_iep.pipeline saves collected data
+IEP_DATA_DIR: Final[str] = "data/iep"
+
+# ---------------------------------------------------------------------------
+# Real-time experiments on IEP data (package `forecasting`)
+# ---------------------------------------------------------------------------
+RT_TARGETS: Final[list[str]] = ["gdp", "cons", "inv", "inv_cap"]
+RT_HORIZON: Final[int] = 8  # quarters ahead (2 years), h=1 is the nowcast of the current quarter
+RT_TEST_LEN: Final[int] = 12  # last quarters with known targets used as the test period
+RT_VALID_LEN: Final[int] = 12  # last quarters of every training sample used for early stopping
+RT_REFIT_EVERY: Final[int] = 4  # re-estimate models every N forecast origins (1 = every quarter)
+RT_TRAIN_STARTS: Final[list[int]] = [2000, 2010]
+RT_FEATURE_TYPES: Final[list[str]] = ["classic", "rolling"]  # classic = log/diff d12, rolling = its rolling means
+RT_AVAILABILITIES: Final[list[int]] = [1, 2, 3]  # months of the current quarter already known
+RT_VARIABLE_SETS: Final[dict[str, Optional[list[str]]]] = {
+    # brent, real retail turnover (physical volume), MIACR, industrial production
+    "short": ["brent", "retail_real", "miacr", "ipi"],
+    # + REER, exports, imports (FOB, mln USD), unemployment, commercial freight turnover
+    "medium": ["brent", "retail_real", "miacr", "ipi", "reer", "ex_usd", "im_usd", "un", "comm_freight"],
+    "all": None,  # every collected monthly variable
+}
+RT_MODELS: Final[list[str]] = ["gb", "ngb", "tabnet", "dfm"]
+RT_N_JOBS: Final[int] = 7  # parallel worker processes
+RT_DFM_N_JOBS: Final[int] = 3  # DFM on all variables needs ~2-4 GB per process
+RT_CONSENSUS_TOP_K: Final[int] = 10  # future consensus = median of the K best backtest specs
+RT_DFM_FACTORS: Final[int] = 2
+RT_DFM_FACTOR_ORDER: Final[int] = 1
+RT_RESULTS_DIR: Final[str] = "results"
