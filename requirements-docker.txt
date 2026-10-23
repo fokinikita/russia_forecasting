@@ -1,0 +1,17 @@
+# Python dependencies of the Docker image (versions = the development environment, Python 3.12).
+# torch is installed separately from the CPU-only index (see Dockerfile), the CUDA build is ~2 GB larger.
+numpy==1.26.4
+pandas==2.1.4
+polars==1.36.1
+pyarrow==22.0.0
+scipy==1.16.3
+scikit-learn==1.8.0
+statsmodels==0.14.6
+catboost==1.2.8
+ngboost==0.5.8
+pytorch-tabnet==4.1.0
+joblib==1.5.3
+attrs==25.4.0
+requests==2.34.2
+matplotlib==3.10.8
+pytest==9.1.1

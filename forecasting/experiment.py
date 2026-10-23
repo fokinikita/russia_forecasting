@@ -11,6 +11,9 @@ test quarter t at horizon h is made from origin T = t - (h - 1) using
 
 Future forecasts use the same code with a single origin: the quarter after the
 last known target, the model being estimated on everything known.
+
+DFM and MF-BVAR are system models: one specification covers all targets and horizons
+(MF-BVAR forecasts recursively and is re-estimated at every origin, see forecasting/mfbvar.py).
 """
 
 from __future__ import annotations
@@ -31,10 +34,12 @@ import config
 from forecasting.dataset import QuarterlyDataset, shift_quarters
 from forecasting.design import TARGET_LAG, DirectDesign
 from forecasting.dfm import DFMForecaster
+from forecasting.mfbvar import MfbvarForecaster
 from forecasting.models import DIRECT_MODELS, make_direct_model
 
 logger = logging.getLogger(__name__)
 
+SYSTEM_MODELS = ("dfm", "mfbvar")  # one estimate for all targets and horizons
 CONFIG_COLUMNS = ["model", "train_start", "var_set", "features_type", "availability"]
 FORECAST_SCHEMA = {
     "model": pl.Utf8,
@@ -114,8 +119,8 @@ class ExperimentGrid:
             for ftype in self.settings.feature_types
             for avail in self.settings.availabilities
         ]
-        if model == "dfm":
-            return [ExperimentConfig("dfm", *b) for b in base]
+        if model in SYSTEM_MODELS:
+            return [ExperimentConfig(model, *b) for b in base]
         if model not in DIRECT_MODELS:
             raise ValueError(f"unknown model {model!r}")
         return [
@@ -239,6 +244,37 @@ def run_dfm(
     )
 
 
+def run_mfbvar(
+    dataset: QuarterlyDataset, settings: ExperimentSettings, cfg: ExperimentConfig, plan: ForecastPlan
+) -> pl.DataFrame:
+    variables = dataset.resolve_variable_set(cfg.var_set, settings.variable_sets[cfg.var_set])
+    origins = [origin for _, _, block in plan.segments for origin in block]
+    forecaster = MfbvarForecaster(
+        dataset,
+        variables,
+        cfg.features_type,
+        cfg.train_start,
+        cfg.availability,
+        horizon=settings.horizon,
+        # variables of capped sets are chosen on data known before the first origin
+        selection_until=min(known for _, known, _ in plan.segments),
+    )
+    forecast = forecaster.forecast(origins).filter(
+        pl.col("target_date").map_elements(plan.keep, return_dtype=pl.Boolean)
+    )
+    if forecast.height == 0:
+        return pl.DataFrame(schema=FORECAST_SCHEMA)
+    feature_cols = _feature_cols(dataset, settings, cfg)
+    shares = {o: _origin_data_share(dataset, feature_cols, o) for o in forecast["origin"].unique().to_list()}
+    return forecast.with_columns(
+        *[pl.lit(v).alias(k) for k, v in cfg.tags().items()],
+        pl.col("origin").replace_strict(shares, return_dtype=pl.Float64).alias("origin_data_share"),
+    ).select([pl.col(name).cast(dtype) for name, dtype in FORECAST_SCHEMA.items()])
+
+
+RUNNERS = {"dfm": run_dfm, "mfbvar": run_mfbvar}
+
+
 def run_task(
     dataset: QuarterlyDataset, settings: ExperimentSettings, cfg: ExperimentConfig, plan: ForecastPlan
 ) -> tuple[ExperimentConfig, Optional[pl.DataFrame], Optional[str]]:
@@ -246,7 +282,7 @@ def run_task(
     try:
         with warnings.catch_warnings(), contextlib.redirect_stdout(io.StringIO()):
             warnings.simplefilter("ignore")
-            runner = run_dfm if cfg.model == "dfm" else run_direct
+            runner = RUNNERS.get(cfg.model, run_direct)
             return cfg, runner(dataset, settings, cfg, plan), None
     except Exception as error:  # one broken spec must not stop the night run
         return cfg, None, f"{type(error).__name__}: {error}"
@@ -285,9 +321,14 @@ class ExperimentRunner:
         configs = list(configs) if configs is not None else ExperimentGrid(self.settings).configs(model)
         # heavy specs first -> better load balance
         configs.sort(key=lambda c: (c.var_set != "all", c.features_type != "rolling"))
-        n_jobs = min(self.n_jobs, config.RT_DFM_N_JOBS) if model == "dfm" else self.n_jobs
+        n_jobs = {
+            "dfm": min(self.n_jobs, config.RT_DFM_N_JOBS),
+            "mfbvar": min(self.n_jobs, config.RT_MFBVAR_N_JOBS),
+        }.get(model, self.n_jobs)
+        # MF-BVAR is re-estimated at every origin, the other models once per plan segment
+        n_points = sum(len(block) for *_, block in plan.segments) if model == "mfbvar" else len(plan.segments)
         logger.info(
-            f"[{model}] {len(configs)} specifications, {len(plan.segments)} estimation points, {n_jobs} workers"
+            f"[{model}] {len(configs)} specifications, {n_points} estimation points, {n_jobs} workers"
         )
 
         started, frames = time.time(), []
@@ -304,7 +345,12 @@ class ExperimentRunner:
                 logger.info(
                     f"[{model}] {done}/{len(configs)} done, {elapsed / 60:.1f} min, eta {elapsed / done * (len(configs) - done) / 60:.1f} min"
                 )
-        return pl.concat(frames) if frames else pl.DataFrame(schema=FORECAST_SCHEMA)
+        result = pl.concat(frames) if frames else pl.DataFrame(schema=FORECAST_SCHEMA)
+        if model == "mfbvar":  # MF-BVAR is estimated at every origin: refit_date < origin = fallback
+            stale = result.filter(pl.col("refit_date") < pl.col("origin")).select(*CONFIG_COLUMNS, "origin").unique()
+            if stale.height:
+                logger.warning(f"[{model}] {stale.height} spec x origin forecasts taken from an earlier origin")
+        return result
 
     def retry(self, failed: pl.DataFrame, plan: ForecastPlan, checkpoint_dir: Path) -> pl.DataFrame:
         """Re-run failed specifications and merge them into the model checkpoints."""

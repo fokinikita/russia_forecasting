@@ -418,3 +418,92 @@ C:\Users\pc\Dropbox\ПК\Desktop\giga_data\.venv\Lib\site-packages\joblib\extern
 [WARNING] 66 specifications failed, see results\runs\2026-10-22\future\failed_specs.csv
 [INFO] future forecasts saved to results\runs\2026-10-22\future
 EXIT 0
+
+# ---- 2026-10-23: MF-BVAR added to this run (other models loaded from checkpoints) ----
+[INFO] backtest: test 2023-07-01 -> 2026-04-01, origins 2021-10-01 -> 2026-04-01, 5 estimation points
+[INFO] [gb] already done, loading results\runs\2026-10-22\backtest\forecasts_gb.parquet
+[INFO] [ngb] already done, loading results\runs\2026-10-22\backtest\forecasts_ngb.parquet
+[INFO] [tabnet] already done, loading results\runs\2026-10-22\backtest\forecasts_tabnet.parquet
+[INFO] [dfm] already done, loading results\runs\2026-10-22\backtest\forecasts_dfm.parquet
+[INFO] [mfbvar] 36 specifications, 19 estimation points, 7 workers
+[INFO] [mfbvar] 1/36 done, 4.3 min, eta 151.3 min
+[INFO] [mfbvar] 2/36 done, 4.4 min, eta 74.1 min
+[INFO] [mfbvar] 3/36 done, 4.4 min, eta 48.3 min
+[INFO] [mfbvar] 4/36 done, 6.6 min, eta 53.1 min
+[INFO] [mfbvar] 5/36 done, 7.3 min, eta 45.3 min
+[INFO] [mfbvar] 6/36 done, 7.3 min, eta 36.7 min
+[INFO] [mfbvar] 7/36 done, 7.3 min, eta 30.4 min
+[INFO] [mfbvar] 8/36 done, 8.9 min, eta 31.3 min
+[INFO] [mfbvar] 9/36 done, 9.0 min, eta 27.1 min
+[INFO] [mfbvar] 10/36 done, 9.0 min, eta 23.5 min
+[INFO] [mfbvar] 11/36 done, 10.7 min, eta 24.3 min
+[INFO] [mfbvar] 12/36 done, 11.1 min, eta 22.2 min
+[INFO] [mfbvar] 13/36 done, 11.1 min, eta 19.7 min
+[INFO] [mfbvar] 14/36 done, 11.2 min, eta 17.5 min
+[INFO] [mfbvar] 15/36 done, 11.7 min, eta 16.3 min
+[INFO] [mfbvar] 16/36 done, 11.7 min, eta 14.7 min
+[INFO] [mfbvar] 17/36 done, 11.8 min, eta 13.2 min
+[INFO] [mfbvar] 18/36 done, 12.1 min, eta 12.1 min
+[INFO] [mfbvar] 19/36 done, 12.1 min, eta 10.9 min
+[INFO] [mfbvar] 20/36 done, 12.2 min, eta 9.7 min
+[INFO] [mfbvar] 21/36 done, 13.3 min, eta 9.5 min
+[INFO] [mfbvar] 22/36 done, 13.4 min, eta 8.5 min
+[INFO] [mfbvar] 23/36 done, 13.5 min, eta 7.6 min
+[INFO] [mfbvar] 24/36 done, 13.5 min, eta 6.8 min
+[INFO] [mfbvar] 25/36 done, 13.7 min, eta 6.0 min
+[INFO] [mfbvar] 26/36 done, 13.8 min, eta 5.3 min
+[INFO] [mfbvar] 27/36 done, 13.9 min, eta 4.6 min
+[INFO] [mfbvar] 28/36 done, 14.6 min, eta 4.2 min
+[INFO] [mfbvar] 29/36 done, 14.8 min, eta 3.6 min
+[INFO] [mfbvar] 30/36 done, 14.8 min, eta 3.0 min
+[INFO] [mfbvar] 31/36 done, 15.6 min, eta 2.5 min
+[INFO] [mfbvar] 32/36 done, 16.0 min, eta 2.0 min
+[INFO] [mfbvar] 33/36 done, 16.0 min, eta 1.5 min
+[INFO] [mfbvar] 34/36 done, 16.1 min, eta 0.9 min
+[INFO] [mfbvar] 35/36 done, 16.3 min, eta 0.5 min
+[INFO] [mfbvar] 36/36 done, 16.5 min, eta 0.0 min
+[INFO] metrics saved to results\runs\2026-10-22\backtest
+[INFO] future: origin 2026-07-01, targets known up to 2026-04-01
+[INFO] [gb] already done, loading results\runs\2026-10-22\future\forecasts_gb.parquet
+[INFO] [ngb] already done, loading results\runs\2026-10-22\future\forecasts_ngb.parquet
+[INFO] [tabnet] already done, loading results\runs\2026-10-22\future\forecasts_tabnet.parquet
+[INFO] [dfm] already done, loading results\runs\2026-10-22\future\forecasts_dfm.parquet
+[INFO] [mfbvar] 36 specifications, 1 estimation points, 7 workers
+[INFO] [mfbvar] 1/36 done, 0.3 min, eta 10.6 min
+[INFO] [mfbvar] 2/36 done, 0.3 min, eta 5.1 min
+[INFO] [mfbvar] 3/36 done, 0.3 min, eta 3.3 min
+[INFO] [mfbvar] 4/36 done, 0.4 min, eta 3.2 min
+[INFO] [mfbvar] 5/36 done, 0.4 min, eta 2.7 min
+[INFO] [mfbvar] 6/36 done, 0.4 min, eta 2.2 min
+[INFO] [mfbvar] 7/36 done, 0.5 min, eta 1.9 min
+[INFO] [mfbvar] 8/36 done, 0.6 min, eta 2.0 min
+[INFO] [mfbvar] 9/36 done, 0.6 min, eta 1.8 min
+[INFO] [mfbvar] 10/36 done, 0.6 min, eta 1.6 min
+[INFO] [mfbvar] 11/36 done, 0.7 min, eta 1.6 min
+[INFO] [mfbvar] 12/36 done, 0.7 min, eta 1.4 min
+[INFO] [mfbvar] 13/36 done, 0.7 min, eta 1.2 min
+[INFO] [mfbvar] 14/36 done, 0.7 min, eta 1.1 min
+[INFO] [mfbvar] 15/36 done, 0.7 min, eta 1.0 min
+[INFO] [mfbvar] 16/36 done, 0.8 min, eta 1.0 min
+[INFO] [mfbvar] 17/36 done, 0.8 min, eta 0.9 min
+[INFO] [mfbvar] 18/36 done, 0.8 min, eta 0.8 min
+[INFO] [mfbvar] 19/36 done, 0.8 min, eta 0.7 min
+[INFO] [mfbvar] 20/36 done, 0.8 min, eta 0.6 min
+[INFO] [mfbvar] 21/36 done, 0.9 min, eta 0.6 min
+[INFO] [mfbvar] 22/36 done, 0.9 min, eta 0.6 min
+[INFO] [mfbvar] 23/36 done, 0.9 min, eta 0.5 min
+[INFO] [mfbvar] 24/36 done, 0.9 min, eta 0.5 min
+[INFO] [mfbvar] 25/36 done, 0.9 min, eta 0.4 min
+[INFO] [mfbvar] 26/36 done, 0.9 min, eta 0.4 min
+[INFO] [mfbvar] 27/36 done, 0.9 min, eta 0.3 min
+[INFO] [mfbvar] 28/36 done, 1.0 min, eta 0.3 min
+[INFO] [mfbvar] 29/36 done, 1.0 min, eta 0.3 min
+[INFO] [mfbvar] 30/36 done, 1.0 min, eta 0.2 min
+[INFO] [mfbvar] 31/36 done, 1.1 min, eta 0.2 min
+[INFO] [mfbvar] 32/36 done, 1.1 min, eta 0.1 min
+[INFO] [mfbvar] 33/36 done, 1.1 min, eta 0.1 min
+[INFO] [mfbvar] 34/36 done, 1.1 min, eta 0.1 min
+[INFO] [mfbvar] 35/36 done, 1.2 min, eta 0.0 min
+[INFO] [mfbvar] 36/36 done, 1.2 min, eta 0.0 min
+[INFO] future forecasts saved to results\runs\2026-10-22\future
+[INFO] dashboard saved to dashboard\macro_dashboard.html (2.2 MB)

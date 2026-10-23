@@ -5,7 +5,7 @@ One row per quarter (quarter start date):
     date | gdp_log_d4 ... | <var>_log_d12_m1 | <var>_log_d12_m2 | ... | <var>_log_d12_roll_mean_3_m1 | ...
 
 * targets  - log y/y growth of the quarterly series (`<target>_log_d4`)
-* features - monthly variables transformed exactly like FeaturesService does
+* features - monthly variables transformed by forecasting.features.MonthlyFeatures
   (log-d12 or d12, plus rolling means of them), split by month of the quarter.
   `_m{a}` = value in month `a` of the quarter, so "availability a" = the first
   `a` months of the quarter are published.
@@ -25,7 +25,7 @@ import attrs
 import polars as pl
 
 import config
-from preprocess_data.prepare_data import FeaturesService
+from forecasting.features import MonthlyFeatures
 
 logger = logging.getLogger(__name__)
 
@@ -111,10 +111,9 @@ class DatasetBuilder:
 
     @staticmethod
     def _monthly_features(monthly: pl.DataFrame) -> tuple[pl.DataFrame, list[str]]:
-        service = FeaturesService()
-        transformed = service._get_features_monthly(monthly.rename({"date": "datem"}).sort("datem"))
-        columns = service.columns_d12 + service.columns_rolling
-        return transformed.select(["datem", *columns]).rename({"datem": "date"}), columns
+        features = MonthlyFeatures()
+        transformed = features.transform(monthly)
+        return transformed, features.columns_d12 + features.columns_rolling
 
     @staticmethod
     def _split_by_month_of_quarter(features: pl.DataFrame, columns: list[str]) -> pl.DataFrame:

@@ -11,10 +11,14 @@ Layout of results (config.RT_RESULTS_DIR):
     runs/<run_id>/backtest/metrics.csv                 RMSE/MAE/bias per spec, target, horizon
     runs/<run_id>/backtest/ranking.csv                 specs ranked by mean RMSE relative to naive
     runs/<run_id>/backtest/best.csv                    best spec per target x horizon x availability
+    runs/<run_id>/backtest/selected_specs.csv          auto-chosen train start / var set / features type
+                                                       per model x target x availability, models ranked
     runs/<run_id>/backtest/rolling.csv                 rolling RMSE per test quarter (quality dynamics)
     runs/<run_id>/future/forecasts.csv                 all specs, 8 quarters ahead
     runs/<run_id>/future/best.csv                      forecast of the best backtest spec
     runs/<run_id>/future/consensus.csv                 median of the top-K backtest specs (recommended)
+    runs/<run_id>/future/selected.csv                  forecasts of the auto-chosen spec of every model
+                                                       (model_rank = 1 -> "auto" forecast)
     metrics_history.csv                                metrics of every run (quality across runs)
     forecasts_history.csv                              consensus and best-spec forecasts of every run
 """
@@ -33,7 +37,14 @@ import polars as pl
 import config
 from forecasting.dataset import DatasetBuilder, QuarterlyDataset
 from forecasting.evaluation import SPEC_COLUMNS, ForecastEvaluator
-from forecasting.experiment import CONFIG_COLUMNS, ExperimentRunner, ExperimentSettings, ForecastPlan
+from forecasting.experiment import (
+    CONFIG_COLUMNS,
+    SYSTEM_MODELS,
+    ExperimentGrid,
+    ExperimentRunner,
+    ExperimentSettings,
+    ForecastPlan,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -115,6 +126,7 @@ class RealTimePipeline:
         summary.write_csv(out_dir / "metrics.csv")
         evaluator.ranking(summary).write_csv(out_dir / "ranking.csv")
         evaluator.best(summary).write_csv(out_dir / "best.csv")
+        evaluator.selected(summary, config.RT_SELECTION_METRIC).write_csv(out_dir / "selected_specs.csv")
         evaluator.rolling(errors).write_csv(out_dir / "rolling.csv")
         _append_csv(
             self.results_dir / "metrics_history.csv",
@@ -138,6 +150,8 @@ class RealTimePipeline:
         return self._save_future(forecasts, out_dir)
 
     def _save_future(self, forecasts: pl.DataFrame, out_dir: Path) -> pl.DataFrame:
+        if config.RT_FUTURE_FALLBACK_TO_PREVIOUS_RUN:
+            forecasts = self._fill_from_previous_runs(forecasts)
         forecasts = forecasts.with_columns(((pl.col("pred").exp() - 1) * 100).alias("pred_yoy_pct")).sort(
             [*SPEC_COLUMNS]
         )
@@ -145,12 +159,26 @@ class RealTimePipeline:
 
         best = self._best_future(forecasts)
         consensus = self._consensus_future(forecasts)
+        selected = self._selected_future(forecasts)
         if best is not None and consensus is not None:
             best.write_csv(out_dir / "best.csv")
             consensus.write_csv(out_dir / "consensus.csv")
             keys = ["target", "availability", "horizon", "origin", "target_date"]
+            spec = pl.concat_str([pl.col(c).cast(pl.Utf8) for c in CONFIG_COLUMNS], separator="/").alias("spec")
+            auto_parts = []
+            if selected is not None:
+                selected.write_csv(out_dir / "selected.csv")
+                auto_parts = [
+                    selected.filter(pl.col("model_rank") == 1).select(
+                        *keys, pl.lit("auto").alias("method"), "pred_yoy_pct", spec
+                    ),
+                    selected.select(
+                        *keys, pl.concat_str([pl.lit("auto_"), pl.col("model")]).alias("method"), "pred_yoy_pct", spec
+                    ),
+                ]
             history = pl.concat(
                 [
+                    *auto_parts,
                     consensus.select(
                         *keys, pl.lit("consensus").alias("method"), "pred_yoy_pct", pl.col("specs").alias("spec")
                     ),
@@ -208,6 +236,82 @@ class RealTimePipeline:
             )
             .sort(["target", "availability", "horizon"])
         )
+
+    def _selected_future(self, forecasts: pl.DataFrame) -> Optional[pl.DataFrame]:
+        """Future path of the auto-chosen spec of every model (see ForecastEvaluator.selected)."""
+        path = self.run_dir / "backtest" / "selected_specs.csv"
+        if not path.exists():
+            return None
+        selected = pl.read_csv(path).select(
+            *CONFIG_COLUMNS,
+            "target",
+            "model_rank",
+            pl.col("mean_rel_rmse").alias("backtest_mean_rel_rmse"),
+            pl.col("mean_rmse").alias("backtest_mean_rmse"),
+        )
+        return forecasts.join(selected, on=[*CONFIG_COLUMNS, "target"], how="inner").sort(
+            ["target", "availability", "model_rank", "horizon"]
+        )
+
+    # ---------------------------------------------------- previous runs
+    def _expected_specs(self) -> pl.DataFrame:
+        """Every spec x target x horizon that a complete future run produces."""
+        rows = []
+        grid = ExperimentGrid(self.settings)
+        horizons = range(1, self.settings.horizon + 1)
+        for model in self.models:
+            for cfg in grid.configs(model):
+                if model in SYSTEM_MODELS:
+                    pairs = [(t, h) for t in self.settings.targets for h in horizons]
+                else:
+                    pairs = [(cfg.target, cfg.horizon)]
+                rows += [{**cfg.tags(), "target": t, "horizon": h} for t, h in pairs]
+        return pl.DataFrame(rows)
+
+    def _fill_from_previous_runs(self, forecasts: pl.DataFrame) -> pl.DataFrame:
+        """Future forecasts that failed in this run are taken from the latest earlier run with the same spec.
+
+        The old path is re-indexed to the current origin (horizon = quarters from the current origin + 1),
+        quarters before the current origin are dropped; `source_run` shows where a row came from.
+        """
+        dataset = self.dataset or self.load_dataset()
+        origin = ForecastPlan.future(dataset).segments[0][0]
+        forecasts = forecasts.with_columns(pl.lit(None, dtype=pl.Utf8).alias("source_run"))
+        spec_keys = [*CONFIG_COLUMNS, "target", "horizon"]
+        missing = self._expected_specs().join(forecasts.select(spec_keys), on=spec_keys, how="anti")
+        runs_dir = self.results_dir / "runs"
+        if missing.height == 0 or not runs_dir.exists():
+            return forecasts
+
+        months = (pl.col("target_date").dt.year() - origin.year) * 12 + pl.col("target_date").dt.month() - origin.month
+        previous = sorted((p for p in runs_dir.iterdir() if p.is_dir() and p.name < self.run_id), reverse=True)
+        filled = []
+        for run_dir in previous:
+            paths = [run_dir / "future" / f"forecasts_{m}.parquet" for m in missing["model"].unique().to_list()]
+            paths = [p for p in paths if p.exists()]
+            if not paths:
+                continue
+            old = (
+                pl.concat([pl.read_parquet(p) for p in paths], how="diagonal")
+                .filter(pl.col("target_date") >= origin)
+                .with_columns((months // 3 + 1).cast(pl.Int64).alias("horizon"), pl.lit(origin).alias("origin"))
+                .join(missing, on=spec_keys, how="semi")
+                .with_columns(pl.lit(run_dir.name).alias("source_run"))
+            )
+            if old.height:
+                filled.append(old)
+                missing = missing.join(old.select(spec_keys), on=spec_keys, how="anti")
+            if missing.height == 0:
+                break
+        if filled:
+            logger.warning(
+                f"future: {sum(f.height for f in filled)} failed forecasts taken from previous runs, "
+                f"{missing.height} still missing"
+            )
+            forecasts = pl.concat([forecasts, *filled], how="diagonal_relaxed")
+        elif missing.height:
+            logger.warning(f"future: {missing.height} spec x target x horizon forecasts missing, no previous run has them")
+        return forecasts
 
     def _best_future(self, forecasts: pl.DataFrame) -> Optional[pl.DataFrame]:
         best_path = self.run_dir / "backtest" / "best.csv"

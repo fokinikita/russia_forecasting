@@ -4,6 +4,8 @@
                    relative to the naive forecast (last known y/y growth)
 * ranking        - specifications ranked by RMSE relative to naive, averaged over horizons
 * best           - best specification per target x horizon x availability
+* selected       - automatic choice per model x target x availability of the train start,
+                   variable set (model size) and features type; models ranked by it
 * errors         - every forecast with its fact and error (quality per test quarter)
 * rolling        - RMSE over a moving window of test quarters (quality dynamics)
 """
@@ -99,6 +101,39 @@ class ForecastEvaluator:
             .first()
             .sort(["target", "availability", "horizon"])
         )
+
+    @staticmethod
+    def selected(summary: pl.DataFrame, metric: str = "rel_rmse_naive") -> pl.DataFrame:
+        """Automatic specification choice for every model, target and availability.
+
+        train_start x var_set x features_type is chosen by `metric` averaged over all horizons (one spec
+        serves the whole 2-year path, which is less noisy than picking a winner per horizon). Specs that
+        miss some horizons (failed estimates) compete only if no complete spec exists.
+        Then the models are ranked (`model_rank`, 1 = the model to use for this target).
+        """
+        keys = ["model", "target", "availability"]
+        candidates = (
+            summary.group_by([*CONFIG_COLUMNS, "target"])
+            .agg(
+                pl.col(metric).mean().alias("score"),
+                pl.col("rel_rmse_naive").mean().alias("mean_rel_rmse"),
+                pl.col("rmse").mean().alias("mean_rmse"),
+                pl.col("mae").mean().alias("mean_mae"),
+                pl.col("horizon").n_unique().alias("n_horizons"),
+                pl.col("n").sum().alias("n_forecasts"),
+            )
+            .with_columns((pl.col("n_horizons") == pl.col("n_horizons").max().over(keys)).alias("_complete"))
+            .with_columns(pl.len().over([*keys, "_complete"]).alias("n_candidates"))
+        )
+        chosen = (
+            candidates.sort(["_complete", "score"], descending=[True, False])
+            .group_by(keys, maintain_order=True)
+            .first()
+            .drop("_complete")
+        )
+        return chosen.with_columns(
+            pl.col("score").rank("ordinal").over(["target", "availability"]).alias("model_rank")
+        ).sort(["target", "availability", "model_rank"])
 
     def rolling(self, errors: pl.DataFrame | None = None) -> pl.DataFrame:
         """RMSE of the last `rolling_window` test quarters, at every test quarter."""

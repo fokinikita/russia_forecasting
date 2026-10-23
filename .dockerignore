@@ -1,0 +1,13 @@
+.git
+.idea
+.venv
+**/__pycache__
+**/.ipynb_checkpoints
+*.ipynb
+catboost_info/
+deepgbm_env/
+DeepGBM/
+GBNN/
+.pt_tmp/
+# mounted as volumes at run time (see docker-compose.yml)
+results/

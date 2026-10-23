@@ -22,7 +22,7 @@ from forecasting.pipeline import RealTimePipeline
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--models", nargs="+", default=list(config.RT_MODELS), choices=["gb", "ngb", "tabnet", "dfm"])
+    parser.add_argument("--models", nargs="+", default=list(config.RT_MODELS), choices=["gb", "ngb", "tabnet", "dfm", "mfbvar"])
     parser.add_argument("--only", choices=["backtest", "future"], help="run only one stage")
     parser.add_argument("--no-refresh", action="store_true", help="do not download IEP data")
     parser.add_argument("--run-id", help="results folder name (default: today)")

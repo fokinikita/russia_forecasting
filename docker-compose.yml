@@ -1,0 +1,17 @@
+# docker compose build
+# docker compose run --rm forecasting                                   # full run (refresh, backtest, future)
+# docker compose run --rm forecasting python -m pipelines.run_realtime --models mfbvar --no-refresh
+services:
+  forecasting:
+    build: .
+    image: russia-forecasting:latest
+    # files in the mounted folders belong to your user, not root (export UID GID or put them in .env)
+    user: "${UID:-1000}:${GID:-1000}"
+    environment:
+      MFBVAR_N_JOBS: "${MFBVAR_N_JOBS:-7}"
+      HOME: /tmp
+    volumes:
+      - ./data:/app/data            # IEP data (refreshed by the pipeline)
+      - ./results:/app/results      # runs, metrics_history.csv, forecasts_history.csv
+      - ./dashboard:/app/dashboard  # macro_dashboard.html
+    command: ["python", "-m", "pipelines.run_realtime", "--n-jobs", "${N_JOBS:-7}"]

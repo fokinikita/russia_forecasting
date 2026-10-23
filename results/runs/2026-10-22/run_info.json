@@ -1,13 +1,14 @@
 {
  "run_id": "2026-10-22",
- "created": "2026-10-22T00:50:37",
+ "created": "2026-10-23T19:14:53",
  "last_known_quarter": "2026-04-01",
  "last_data_quarter": "2026-07-01",
  "models": [
   "gb",
   "ngb",
+  "tabnet",
   "dfm",
-  "tabnet"
+  "mfbvar"
  ],
  "settings": {
   "targets": [

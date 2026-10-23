@@ -1,15 +1,11 @@
 # Игнорировать все Excel и CSV файлы
 *.csv
-!preds/
-!preds/*.csv
 !data/iep/metadata.csv
 !results/**/*.csv
 
-# Игнорировать Jupyter Notebook файлы
+# Jupyter-ноутбуки (локальный анализ, в репозиторий не идут)
 *.ipynb
-!metrics.ipynb
-!compare_old_vs_iep.ipynb
-!realtime_results.ipynb
+.ipynb_checkpoints/
 
 # Игнорировать файлы R
 *.RData
@@ -44,3 +40,4 @@ giga_data_prep_07_2025.xlsx
 DeepGBM/
 GBNN/
 deepgbm_env/
+.pytest_cache/

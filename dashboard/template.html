@@ -831,6 +831,17 @@
         .control-tab.disabled {opacity:.45;}
         .control-tab.disabled select {cursor:not-allowed;}
         .control-tab .hint {display:block;margin-top:5px;font-size:10.5px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .control-tab .hint.auto {color:#059669;font-weight:600;}
+        .horizon-picker {display:none;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px;padding:10px 14px;
+                         background:#fffbeb;border:1px solid #fde68a;border-radius:12px;}
+        .horizon-picker.show {display:flex;}
+        .horizon-picker .hp-label {font-size:13px;font-weight:600;color:#92400e;}
+        .horizon-picker .hp-hint {font-size:12px;color:#78716c;}
+        .horizon-picker .seg button {min-width:46px;}
+        #horizonBody tr {cursor:pointer;}
+        #horizonBody tr:hover td {background:#fef3c7;}
+        #horizonBody tr td.h-cell::before {content:'▸ ';color:#f59e0b;font-weight:700;}
+        .control-tab.auto-chosen select {border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.15);}
 
         .seg {display:inline-flex;background:#f1f5f9;border-radius:10px;padding:3px;gap:2px;}
         .seg button {border:none;background:transparent;padding:6px 12px;border-radius:8px;font:500 12px inherit;color:#475569;cursor:pointer;font-family:inherit;}
@@ -1016,10 +1027,14 @@
                             <option value="10" selected>10 лет</option>
                             <option value="all">С 2000 г.</option>
                         </select>
-                        <button class="btn btn-success btn-sm" onclick="exportExcel()" title="Все прогнозы и метрики в Excel">📊 Excel</button>
-                        <button class="btn btn-outline btn-sm" onclick="exportCSV()" title="Данные текущего графика">📥 CSV</button>
+                        <button class="btn btn-success btn-sm" id="excelButton" onclick="exportExcel()" title="Данные открытой вкладки в Excel">📊 Excel</button>
                         <button class="btn btn-outline btn-sm" onclick="exportChart()">🖼 PNG</button>
                     </div>
+                </div>
+                <div class="horizon-picker" id="horizonPicker">
+                    <span class="hp-label">Горизонт прогноза:</span>
+                    <div class="seg" id="horizonSeg"></div>
+                    <span class="hp-hint" id="horizonHint"></span>
                 </div>
                 <div class="chart-wrapper">
                     <canvas id="mainChart"></canvas>
@@ -1054,7 +1069,8 @@
                     MAE — средняя абсолютная ошибка прогноза темпа роста г/г, п.п., по 12 кварталам ретроспективы.
                     «Наивный» — MAE прогноза «темп роста как в последнем известном квартале».
                     «Модель / наивный» меньше 100% — модель точнее наивного прогноза.
-                    Нажмите на строку, чтобы увидеть исторические прогнозы этого горизонта.
+                    <b>Нажмите на строку</b> (или кнопку «h = …» над графиком в режиме «Ретроспектива»), чтобы увидеть
+                    исторические прогнозы этого горизонта.
                 </div>
             </div>
         </div>
@@ -1083,11 +1099,12 @@
 
         const MODELS = {
             consensus: { name: 'Консенсус (медиана топ-10)', option: 'Консенсус топ-10', short: 'Консенсус' },
-            best: { name: 'Лучшая спецификация', option: 'Лучшая спецификация', short: 'Лучшая' },
+            best: { name: 'Лучшая спецификация (автовыбор)', option: 'Лучшая спецификация', short: 'Лучшая' },
             gb: { name: 'CatBoost', option: 'CatBoost', short: 'CatBoost' },
             ngb: { name: 'NGBoost', option: 'NGBoost', short: 'NGBoost' },
             dfm: { name: 'DFM', option: 'DFM', short: 'DFM' },
             tabnet: { name: 'TabNet (нейросеть)', option: 'TabNet (нейросеть)', short: 'TabNet' },
+            mfbvar: { name: 'MF-BVAR', option: 'MF-BVAR', short: 'MF-BVAR' },
         };
         const SELECTED_MODELS = ['consensus', 'best'];
         const TARGET_OPTIONS = {
@@ -1106,7 +1123,7 @@
         };
         const COLORS = { fact: '#4f46e5', forecast: '#f59e0b', naive: '#9ca3af' };
         // fixed colour per model for comparison lines (colour follows the model, not the order of selection)
-        const COMPARE_COLORS = { consensus: '#0d9488', best: '#7c3aed', gb: '#db2777', ngb: '#16a34a', dfm: '#0284c7', tabnet: '#dc2626' };
+        const COMPARE_COLORS = { consensus: '#0d9488', best: '#7c3aed', gb: '#db2777', ngb: '#16a34a', dfm: '#0284c7', tabnet: '#dc2626', mfbvar: '#ca8a04' };
         const ROMAN = ['I', 'II', 'III', 'IV'];
         // consensus band: middle half of the top-K forecasts (min-max is driven by single outliers)
         const BAND_Q = [0.25, 0.75];
@@ -1290,8 +1307,20 @@
         }
         function specDescription(model) {
             if (model === 'consensus') return `медиана ${DATA.meta.top_k} лучших спецификаций на каждом горизонте`;
-            if (model === 'best') return 'лучшая на ретроспективе спецификация на каждом горизонте';
+            if (model === 'best') {
+                const c = chosenSpec();
+                return c ? `${MODELS[c.model].short} · с ${c.start} г. · ${VARSET_NAMES[c.varset]} набор · ${FTYPE_NAMES[c.ftype]} признаки`
+                         : 'лучшая на ретроспективе спецификация';
+            }
             return `с ${state.sample} г. · ${VARSET_NAMES[state.varset]} набор · ${FTYPE_NAMES[state.ftype]} признаки`;
+        }
+        // spec chosen automatically for "best": {model, start, varset, ftype} or null
+        function chosenSpec(s = state) {
+            const spec = getSpec('best');
+            const key = spec && (spec.chosen || (spec.members && spec.members.find(Boolean)));
+            if (!key) return null;
+            const [model, start, varset, ftype] = key.split('/');
+            return { model, start, varset, ftype };
         }
         function memberText(spec, h) {
             const m = spec && spec.members && spec.members[h - 1];
@@ -1383,19 +1412,27 @@
                 el.querySelector('select').addEventListener('change', () => {
                     const modelSelect = document.getElementById('modelSelect');
                     if (SELECTED_MODELS.includes(modelSelect.value)) {
-                        modelSelect.value = 'gb';
-                        showToast('Выборка, набор и признаки задаются для отдельной модели — выбрана CatBoost');
+                        const c = modelSelect.value === 'best' ? chosenSpec() : null;
+                        const model = c ? c.model : 'gb';
+                        modelSelect.value = model;
+                        showToast(`Выборка, набор и признаки задаются для отдельной модели — выбрана ${MODELS[model].short}`);
                     }
                     update();
                 });
             });
             document.querySelectorAll('#viewSeg button').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+            const hseg = document.getElementById('horizonSeg');
+            hseg.innerHTML = Array.from({ length: DATA.meta.horizon }, (_, i) =>
+                `<button data-h="${i + 1}" title="прогнозы, сделанные за ${i + 1} кв. до целевого квартала">h = ${i + 1}</button>`).join('');
+            hseg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { state.horizon = +b.dataset.h; update(); }));
         }
 
         function setView(view) {
             state.view = view;
             document.querySelectorAll('#viewSeg button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
             document.getElementById('periodSelect').style.display = view === 'test' ? 'none' : '';
+            document.getElementById('horizonPicker').classList.toggle('show', view === 'test');
+            document.getElementById('excelButton').title = `Скачать Excel — ${EXPORT_TITLES[view]}`;
             update();
         }
 
@@ -1443,7 +1480,9 @@
         function updateModelMetrics(spec) {
             const s = summaryStats(spec);
             const cls = s.err == null ? '' : (s.err < s.naive ? 'good' : 'bad');
-            document.getElementById('modelBadge').textContent = MODELS[state.model].short;
+            const chosen = state.model === 'best' ? chosenSpec() : null;
+            document.getElementById('modelBadge').textContent = chosen
+                ? `${MODELS.best.short}: ${MODELS[chosen.model].short}` : MODELS[state.model].short;
             document.getElementById('specBadge').textContent = specDescription(state.model);
             const rm = document.getElementById('metricMAE');
             rm.textContent = fmt(s.err, 2); rm.className = 'value ' + cls;
@@ -1711,8 +1750,20 @@
         function update() {
             readControls();
             const isSelection = SELECTED_MODELS.includes(state.model);
-            document.querySelectorAll('.spec-control .hint').forEach(el => {
-                el.textContent = isSelection ? 'консенсус: подбор авто' : '';
+            const chosen = state.model === 'best' ? chosenSpec() : null;
+            if (chosen) {
+                // show the automatically chosen spec in the controls themselves
+                document.getElementById('sampleSelect').value = chosen.start;
+                document.getElementById('varsetSelect').value = chosen.varset;
+                document.getElementById('ftypeSelect').value = chosen.ftype;
+                readControls();
+            }
+            document.querySelectorAll('.spec-control').forEach(el => {
+                const hint = el.querySelector('.hint');
+                hint.textContent = chosen ? `✓ автовыбор · ${MODELS[chosen.model].short}`
+                    : (state.model === 'consensus' ? `медиана топ-${DATA.meta.top_k} спецификаций` : '');
+                hint.classList.toggle('auto', !!chosen);
+                el.classList.toggle('auto-chosen', !!chosen);
             });
 
             const spec = getSpec(state.model);
@@ -1739,9 +1790,14 @@
             const titles = {
                 level: 'факт + прогноз на 2 года, уровни',
                 yoy: 'факт + прогноз на 2 года, темп роста к тому же кварталу прошлого года',
-                test: `качество прогноза на ретроспективных данных: прогнозы за ${state.horizon} кв. до целевого квартала`,
+                test: `ретроспектива, горизонт h = ${state.horizon}: прогнозы за ${state.horizon} кв. до целевого квартала (горизонт меняется кнопками ниже)`,
             };
             document.getElementById('chartTitle').innerHTML = `${t.name} <span>${titles[state.view]}</span>`;
+            document.querySelectorAll('#horizonSeg button').forEach(b => b.classList.toggle('active', +b.dataset.h === state.horizon));
+            const h0 = state.horizon;
+            document.getElementById('horizonHint').textContent = h0 === 1
+                ? 'h = 1 — наукаст: прогноз текущего квартала'
+                : `h = ${h0} — прогноз сделан за ${h0} кв. до целевого квартала (на ${h0} кв. вперёд от последнего известного факта)`;
             const cfg = state.view === 'test' ? buildTestChart(spec, compares) : buildSeriesChart(spec, path, compares);
             renderChart(cfg);
 
@@ -1752,11 +1808,12 @@
                      + `(${h === 1 ? 'наукаст: прогноз текущего квартала' : `например, точка ${qShort(DATA.test_dates[0])} сделана в ${qShort(addQuarters(DATA.test_dates[0], -(h - 1)))}`}), `
                      + `обучаясь только на данных, опубликованных к тому моменту. `
                      + `Синяя линия — фактический темп роста, серая — наивный прогноз (последний известный темп роста). `
-                     + `Чем ближе оранжевая линия к синей и чем дальше серая, тем полезнее модель. Другой горизонт — нажмите на строку справа.`;
+                     + `Чем ближе оранжевая линия к синей и чем дальше серая, тем полезнее модель. Другой горизонт — кнопки «h = …» над графиком или строка таблицы справа. `
+                     + `Факт и прогнозы на всех горизонтах — кнопка «📊 Excel».`;
             } else {
                 note = `Прогноз от ${qLong(DATA.meta.origin)} — первого квартала без опубликованного значения. `;
                 if (state.model === 'consensus') note += `Консенсус — медиана ${DATA.meta.top_k} спецификаций с наименьшей ошибкой на ретроспективе; закрашено — диапазон 25–75% их прогнозов (средняя половина, без крайних оценок), а не вероятностный интервал. Наведите на строку горизонта справа, чтобы увидеть состав.`;
-                if (state.model === 'best') note += 'Лучшая спецификация выбирается отдельно для каждого горизонта; наведите на строку горизонта справа, чтобы увидеть её.';
+                if (state.model === 'best') note += 'Лучшая спецификация: для каждой модели автоматически выбраны начало обучающей выборки, набор переменных и тип признаков (по средней ошибке на всех горизонтах ретроспективы), затем выбрана лучшая модель. Выбранные значения показаны в полях «Выборка», «Набор переменных», «Признаки».';
             }
             if (!spec) note += ' Для выбранной комбинации нет результатов.';
             document.getElementById('chartNote').textContent = note;
@@ -1786,80 +1843,60 @@
             URL.revokeObjectURL(url);
         }
 
-        function exportCSV() {
-            if (!chartRows.length) return;
-            const cols = [...new Set(chartRows.flatMap(r => Object.keys(r)))];
-            const esc = v => v == null ? '' : String(v).includes(';') ? `"${v}"` : String(v);
-            const csv = [cols.join(';'), ...chartRows.map(r => cols.map(c => esc(r[c])).join(';'))].join('\n');
-            download(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }), `${state.target}_${state.model}_${state.view}.csv`);
-            showToast('CSV скачан (данные текущего графика)');
-        }
 
-        function specRows(target, onlyAvail = true) {
-            const rows = { forecasts: [], metrics: [] };
-            Object.entries(DATA.targets[target].specs).forEach(([key, spec]) => {
-                const parts = key.split('/');
-                const avail = +parts[parts.length - 1];
-                if (onlyAvail && avail !== state.avail) return;
-                const isSel = SELECTED_MODELS.includes(parts[0]);
-                const base = {
-                    'Показатель': TARGET_OPTIONS[target], 'Модель': MODELS[parts[0]].option,
-                    'Выборка': isSel ? '' : `с ${parts[1]} г.`, 'Набор переменных': isSel ? '' : VARSET_NAMES[parts[2]],
-                    'Признаки': isSel ? '' : FTYPE_NAMES[parts[3]], 'Доступность, мес.': avail,
+        // fact + historical forecasts of the current model on every horizon: one row per test quarter
+        function retroRows(model = state.model, target = state.target) {
+            const t = DATA.targets[target];
+            const spec = getSpec(model, target);
+            const levels = historyMap(target);
+            const c = model === 'best' ? chosenSpec() : null;
+            const specText = c ? `${MODELS[c.model].short} · с ${c.start} г. · ${VARSET_NAMES[c.varset]} · ${FTYPE_NAMES[c.ftype]}`
+                : SELECTED_MODELS.includes(model) ? specDescription(model)
+                : `с ${state.sample} г. · ${VARSET_NAMES[state.varset]} · ${FTYPE_NAMES[state.ftype]}`;
+            return DATA.test_dates.map((d, i) => {
+                const row = {
+                    'Показатель': TARGET_OPTIONS[target], 'Модель': MODELS[model].option, 'Спецификация': specText,
+                    'Доступность, мес.': state.avail, 'Целевой квартал': qShort(d),
+                    'Факт, трлн ₽': levels.has(d) ? round(levels.get(d) / 1000) : null,
+                    'Факт г/г, %': round(pct(t.test_fact[i])),
                 };
-                const path = forecastPath(spec, target) || [];
-                path.forEach((r, i) => rows.forecasts.push({
-                    ...base, 'Горизонт': i + 1, 'Квартал': qShort(r.date),
-                    'Уровень, трлн ₽': r.level == null ? null : round(r.level / 1000), 'Темп роста г/г, %': round(r.yoy),
-                    ...(r.yoyLo != null ? { 'Топ-10, 25%': round(r.yoyLo), 'Топ-10, 75%': round(r.yoyHi) } : {}),
-                }));
-                horizonStats(spec, target).forEach(s => rows.metrics.push({
-                    ...base, 'Горизонт': s.h, 'MAE модели, п.п.': round(s.err), 'MAE наивного, п.п.': round(s.naive),
-                    'Модель / наивный': round(s.ratio), 'Статус': s.good === null ? '' : (s.good ? 'лучше наивного' : 'хуже наивного'),
-                }));
+                for (let h = 1; h <= DATA.meta.horizon; h++) {
+                    row[`Прогноз h=${h} г/г, %`] = spec ? round(pct(spec.test[h - 1][i])) : null;
+                }
+                for (let h = 1; h <= DATA.meta.horizon; h++) row[`Наивный h=${h} г/г, %`] = round(pct(t.naive[String(h)].pred[i]));
+                for (let h = 1; h <= DATA.meta.horizon; h++) {
+                    const v = spec ? pct(spec.test[h - 1][i]) : null, f = pct(t.test_fact[i]);
+                    row[`Ошибка h=${h}, п.п.`] = v == null || f == null ? null : round(v - f);
+                }
+                return row;
             });
-            return rows;
         }
 
+
+
+        // Excel of the open tab: levels / y/y growth (history + forecast) or the retrospective on every horizon
+        const EXPORT_TITLES = {
+            level: 'уровни: факт и прогноз на 2 года',
+            yoy: 'темпы роста г/г: факт и прогноз на 2 года',
+            test: 'ретроспектива: факт и исторические прогнозы на всех горизонтах h = 1…8',
+        };
         function exportExcel() {
-            if (typeof XLSX === 'undefined') { showToast('Excel недоступен без интернета — используйте CSV'); return; }
+            if (typeof XLSX === 'undefined') { showToast('Excel недоступен: библиотека не загрузилась'); return; }
             const wb = XLSX.utils.book_new();
             const add = (rows, name) => { if (rows.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), name); };
             const spec = getSpec(state.model);
-            // 1. current selection: history + forecast
-            add(tableRows.map(r => ({
-                'Квартал': qShort(r.date), 'Тип': r.type, 'Уровень, трлн ₽': r.level == null ? null : round(r.level / 1000),
-                'Темп роста г/г, %': round(r.yoy), 'Среднее топ-10, %': round(r.yoyMean), 'Топ-10, 25%': round(r.yoyLo), 'Топ-10, 75%': round(r.yoyHi),
-            })), 'Выбранный прогноз');
-            // 2. quality by horizon of the current selection
-            add(horizonStats(spec).map(s => ({
-                'Горизонт': s.h, 'Прогнозный квартал': qShort(addQuarters(DATA.meta.origin, s.h - 1)), 'MAE модели, п.п.': round(s.err),
-                'MAE наивного, п.п.': round(s.naive), 'Модель / наивный': round(s.ratio),
-                'Статус': s.good === null ? '' : (s.good ? 'лучше наивного' : 'хуже наивного'),
-                'Состав (консенсус / лучшая)': memberText(spec, s.h).replace(/\n/g, '; '),
-            })), 'Качество по горизонтам');
-            // 3. historical forecasts of the current selection for every horizon
-            const t = DATA.targets[state.target];
-            const retro = [];
-            for (let h = 1; h <= DATA.meta.horizon; h++) {
-                DATA.test_dates.forEach((d, i) => retro.push({
-                    'Горизонт': h, 'Целевой квартал': qShort(d), 'Прогноз сделан в': qShort(addQuarters(d, -(h - 1))),
-                    'Факт г/г, %': round(pct(t.test_fact[i])), 'Прогноз модели г/г, %': spec ? round(pct(spec.test[h - 1][i])) : null,
-                    'Наивный г/г, %': round(pct(t.naive[String(h)].pred[i])),
-                }));
+            if (state.view === 'test') {
+                add(retroRows(), 'Ретро факт и прогноз');
+                add(horizonStats(spec).map(s => ({
+                    'Горизонт': s.h, 'MAE модели, п.п.': round(s.err), 'MAE наивного, п.п.': round(s.naive),
+                    'Модель / наивный': round(s.ratio), 'Статус': s.good === null ? '' : (s.good ? 'лучше наивного' : 'хуже наивного'),
+                })), 'Качество по горизонтам');
+            } else {
+                add(chartRows, state.view === 'level' ? 'Уровни' : 'Темпы роста');
             }
-            add(retro, 'Ретроспектива');
-            add(annualEstimates(forecastPath(spec)).map(r => ({
-                'Год': r.year, 'Темп роста за год, %': round(r.growth, 2),
-                'Среднее топ-10, %': round(r.mean, 2), 'Топ-10, 25%': round(r.lo, 2), 'Топ-10, 75%': round(r.hi, 2),
-                'Факт': r.factQ, 'Прогноз': r.fcQ,
-            })), 'Годовые оценки');
-            // 4-5. every model and specification for every indicator
-            const all = Object.keys(DATA.targets).map(k => specRows(k));
-            add(all.flatMap(r => r.forecasts), 'Все прогнозы');
-            add(all.flatMap(r => r.metrics), 'Все метрики');
-            XLSX.writeFile(wb, `macro_forecast_${DATA.meta.run_id}.xlsx`);
-            showToast('Excel скачан');
+            const names = { level: 'levels', yoy: 'yoy', test: 'retro' };
+            XLSX.writeFile(wb, `${names[state.view]}_${state.target}_${state.model}_a${state.avail}_${DATA.meta.run_id}.xlsx`);
+            showToast(`Excel скачан — ${EXPORT_TITLES[state.view]}`);
         }
 
         function exportChart() {

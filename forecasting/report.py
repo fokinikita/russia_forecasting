@@ -51,6 +51,16 @@ class RunResults:
         return self._csv("backtest", "best.csv")
 
     @property
+    def selected_specs(self) -> Optional[pl.DataFrame]:
+        path = self.run_dir / "backtest" / "selected_specs.csv"
+        return pl.read_csv(path) if path.exists() else None
+
+    @property
+    def future_selected(self) -> Optional[pl.DataFrame]:
+        path = self.run_dir / "future" / "selected.csv"
+        return pl.read_csv(path, try_parse_dates=True) if path.exists() else None
+
+    @property
     def rolling(self) -> pl.DataFrame:
         return self._csv("backtest", "rolling.csv")
 

@@ -132,8 +132,17 @@ class DashboardBuilder:
         )
 
     def _best_errors(self, errors: pl.DataFrame) -> pl.DataFrame:
-        best = self.run.best.select(*CONFIG_COLUMNS, "target", "horizon")
-        return errors.join(best, on=[*CONFIG_COLUMNS, "target", "horizon"]).with_columns(
+        """Backtest of the best specification: the top-ranked model with its auto-selected train start,
+        variable set and features type (one spec for all horizons, backtest/selected_specs.csv).
+        Runs made before the automatic selection existed fall back to the best spec per horizon."""
+        selected = self.run.selected_specs
+        if selected is None:
+            best = self.run.best.select(*CONFIG_COLUMNS, "target", "horizon")
+            joined = errors.join(best, on=[*CONFIG_COLUMNS, "target", "horizon"])
+        else:
+            chosen = selected.filter(pl.col("model_rank") == 1).select(*CONFIG_COLUMNS, "target")
+            joined = errors.join(chosen, on=[*CONFIG_COLUMNS, "target"])
+        return joined.with_columns(
             pl.concat_str([pl.lit("best"), pl.col("availability").cast(pl.Utf8)], separator="/").alias("key")
         )
 
@@ -228,11 +237,21 @@ class DashboardBuilder:
                 round(row["max_yoy_pct"], 3),
             ]
             entry.setdefault("members", [None] * horizon)[row["horizon"] - 1] = row["specs"]
-        for row in self.run.future_best.iter_rows(named=True):
+        future_selected = self.run.future_selected
+        best_future = (
+            self.run.future_best if future_selected is None else future_selected.filter(pl.col("model_rank") == 1)
+        )
+        for row in best_future.iter_rows(named=True):
             entry = spec_entry(row["target"], f"best/{row['availability']}")
             entry["future"][row["horizon"] - 1] = round(row["pred"], 5)
             spec = "/".join(str(row[c]) for c in CONFIG_COLUMNS)
             entry.setdefault("members", [None] * horizon)[row["horizon"] - 1] = spec
+        selected = self.run.selected_specs
+        if selected is not None:
+            # the chosen spec is shown in the sample / variable set / features controls
+            for row in selected.filter(pl.col("model_rank") == 1).iter_rows(named=True):
+                entry = spec_entry(row["target"], f"best/{row['availability']}")
+                entry["chosen"] = "/".join(str(row[c]) for c in CONFIG_COLUMNS)
 
         origin = future["origin"].min()
         return {
