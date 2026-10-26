@@ -192,6 +192,9 @@ cp .env.example .env && nano .env      # ключи S3, пароль Airflow, л
 docker compose up -d --build           # первая сборка ~15-20 минут (компиляция mfbvar)
 ```
 
+Если Docker установлен через snap, проект должен лежать в `/root` или `/home` (snap не видит `/opt`);
+на сервере проекта — `/root/projects/russia_forecasting`.
+
 Интерфейс Airflow: `http://<сервер>:8095`, пользователь `admin`, пароль `AIRFLOW_ADMIN_PASSWORD` из `.env`.
 Обновить код: `git pull && docker compose up -d --build`.
 
