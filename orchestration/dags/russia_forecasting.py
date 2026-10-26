@@ -59,7 +59,7 @@ with DAG(
     dag_id="russia_forecasting_weekly",
     description="IEP data -> backtest (retro metrics) -> 2-year forecasts -> CBR forecasts -> dashboard, all in S3",
     schedule="0 5 * * 1",
-    start_date=pendulum.datetime(2026, 10, 1, tz=TZ),
+    start_date=pendulum.datetime(2026, 10, 27, tz=TZ),  # first scheduled run: Monday 2026-11-02 05:00
     catchup=False,
     max_active_runs=1,
     max_active_tasks=1,
