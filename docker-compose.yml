@@ -1,17 +1,61 @@
-# docker compose build
-# docker compose run --rm forecasting                                   # full run (refresh, backtest, future)
-# docker compose run --rm forecasting python -m pipelines.run_realtime --models mfbvar --no-refresh
+# Weekly forecasting service: one container with Airflow + the models (Python, R).
+#
+#   cp .env.example .env && nano .env        # S3 keys, Airflow password
+#   docker compose up -d --build             # UI: http://<server>:8095 (admin / AIRFLOW_ADMIN_PASSWORD)
+#   docker compose logs -f airflow
+#
+# Manual runs of single stages without Airflow (same image, same S3):
+#   docker compose run --rm airflow python -m service.cli check
+#   docker compose run --rm airflow python -m service.cli backtest --model gb --date 2026-11-02
+name: russia-forecasting
+
 services:
-  forecasting:
+  airflow:
     build: .
     image: russia-forecasting:latest
-    # files in the mounted folders belong to your user, not root (export UID GID or put them in .env)
-    user: "${UID:-1000}:${GID:-1000}"
+    container_name: russia-forecasting-airflow
+    restart: unless-stopped
+    env_file: .env
     environment:
-      MFBVAR_N_JOBS: "${MFBVAR_N_JOBS:-7}"
+      TZ: Europe/Moscow
       HOME: /tmp
+      # parallel processes of the models (keep below `cpus`), see README
+      N_JOBS: "${N_JOBS:-8}"
+      MFBVAR_N_JOBS: "${MFBVAR_N_JOBS:-8}"
+      DFM_N_JOBS: "${DFM_N_JOBS:-2}"
+      # S3-compatible storage: no new default boto3 checksums
+      AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+      AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+      # Airflow
+      AIRFLOW_HOME: /opt/airflow
+      AIRFLOW__CORE__DAGS_FOLDER: /app/orchestration/dags
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__PARALLELISM: "2"
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: Europe/Moscow
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: admin:admin
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/passwords.json
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////opt/airflow/airflow.db
+      AIRFLOW__API__PORT: "8080"
+      AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: Europe/Moscow
+    ports:
+      - "${AIRFLOW_PORT:-8095}:8080"
     volumes:
-      - ./data:/app/data            # IEP data (refreshed by the pipeline)
-      - ./results:/app/results      # runs, metrics_history.csv, forecasts_history.csv
-      - ./dashboard:/app/dashboard  # macro_dashboard.html
-    command: ["python", "-m", "pipelines.run_realtime", "--n-jobs", "${N_JOBS:-7}"]
+      - airflow_home:/opt/airflow   # SQLite with run states, JWT secret (results and logs are in S3)
+      - data:/app/data              # working copy of the IEP data (source of truth: S3 raw_data/)
+      - results:/app/results        # working copy of runs (source of truth: S3)
+    # the server is shared with other services: hard limits
+    mem_limit: "${MEM_LIMIT:-12g}"
+    cpus: "${CPUS:-10}"
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8080/api/v2/monitor/health"]
+      interval: 60s
+      timeout: 10s
+      start_period: 120s
+      retries: 3
+
+volumes:
+  airflow_home:
+  data:
+  results:

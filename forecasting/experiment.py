@@ -168,6 +168,64 @@ class ForecastPlan:
         return self.target_dates is None or target_date in self.target_dates
 
 
+# ------------------------------------------------------------- model sink
+@attrs.frozen
+class ModelSink:
+    """Saves fitted models of chosen specifications (used for the future forecasts).
+
+    keys: "model/train_start/var_set/features_type/a<availability>/target" of the specs to keep
+    (backtest/selected_specs.csv). Direct models -> one joblib file per target x horizon; DFM -> its
+    estimated parameters (enough to rebuild the state-space model on the same data). MF-BVAR lives in R
+    and is re-estimated at every origin, it is not saved.
+    """
+
+    directory: Path
+    keys: frozenset
+
+    @staticmethod
+    def key(cfg: ExperimentConfig, target: str) -> str:
+        return "/".join([cfg.model, str(cfg.train_start), cfg.var_set, cfg.features_type, f"a{cfg.availability}", target])
+
+    def wants(self, cfg: ExperimentConfig, target: Optional[str] = None) -> bool:
+        targets = [target] if target else [t for t in config.RT_TARGETS]
+        return any(self.key(cfg, t) in self.keys for t in targets)
+
+    def _path(self, cfg: ExperimentConfig, suffix: str) -> Path:
+        path = self.directory / cfg.model / f"{cfg.label.replace('/', '__')}{suffix}"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        return path
+
+    def save_direct(self, cfg: ExperimentConfig, model, feature_cols: tuple[str, ...], known_until: date) -> None:
+        import joblib
+
+        try:
+            joblib.dump(
+                {
+                    "config": cfg.label,
+                    "target": cfg.target,
+                    "horizon": cfg.horizon,
+                    "feature_columns": list(feature_cols),
+                    "targets_known_until": known_until.isoformat(),
+                    "model": model,
+                },
+                self._path(cfg, ".joblib"),
+                compress=3,
+            )
+        except Exception as error:  # saving a model must never break the forecast
+            logger.warning(f"{cfg.label}: model not saved ({error})")
+
+    def save_dfm(self, cfg: ExperimentConfig, dfm: DFMForecaster, known_until: date) -> None:
+        try:
+            results = dfm.results
+            pl.DataFrame({"param": list(results.model.param_names), "value": list(map(float, results.params))}).with_columns(
+                pl.lit(cfg.label).alias("config"),
+                pl.lit(known_until.isoformat()).alias("targets_known_until"),
+                pl.lit(",".join(results.model.endog_names)).alias("endog_names"),
+            ).write_parquet(self._path(cfg, ".params.parquet"))
+        except Exception as error:
+            logger.warning(f"{cfg.label}: DFM parameters not saved ({error})")
+
+
 # ------------------------------------------------------------------- tasks
 def _feature_cols(dataset: QuarterlyDataset, settings: ExperimentSettings, cfg: ExperimentConfig) -> tuple[str, ...]:
     variables = dataset.resolve_variable_set(cfg.var_set, settings.variable_sets[cfg.var_set])
@@ -183,7 +241,11 @@ def _origin_data_share(dataset: QuarterlyDataset, feature_cols: tuple[str, ...],
 
 
 def run_direct(
-    dataset: QuarterlyDataset, settings: ExperimentSettings, cfg: ExperimentConfig, plan: ForecastPlan
+    dataset: QuarterlyDataset,
+    settings: ExperimentSettings,
+    cfg: ExperimentConfig,
+    plan: ForecastPlan,
+    sink: Optional[ModelSink] = None,
 ) -> pl.DataFrame:
     feature_cols = _feature_cols(dataset, settings, cfg)
     design = DirectDesign(dataset, cfg.target, cfg.horizon, feature_cols)
@@ -202,6 +264,8 @@ def run_direct(
         x_pred, _ = design.to_numpy(to_predict)
         model = make_direct_model(cfg.model).fit(x_train, y_train)
         preds = model.predict(x_pred)
+        if sink is not None and sink.wants(cfg, cfg.target):
+            sink.save_direct(cfg, model, feature_cols, known_until)
         for origin, target_date, pred in zip(to_predict["origin"], to_predict["target_date"], preds):
             rows.append(
                 {
@@ -219,12 +283,18 @@ def run_direct(
 
 
 def run_dfm(
-    dataset: QuarterlyDataset, settings: ExperimentSettings, cfg: ExperimentConfig, plan: ForecastPlan
+    dataset: QuarterlyDataset,
+    settings: ExperimentSettings,
+    cfg: ExperimentConfig,
+    plan: ForecastPlan,
+    sink: Optional[ModelSink] = None,
 ) -> pl.DataFrame:
     feature_cols = _feature_cols(dataset, settings, cfg)
     frames = []
     for refit_date, known_until, origins in plan.segments:
         dfm = DFMForecaster(dataset, feature_cols, cfg.train_start).fit(known_until)
+        if sink is not None and sink.wants(cfg):
+            sink.save_dfm(cfg, dfm, known_until)
         for origin in origins:
             forecast = dfm.forecast(origin, settings.horizon).filter(
                 pl.col("target_date").map_elements(plan.keep, return_dtype=pl.Boolean)
@@ -245,7 +315,11 @@ def run_dfm(
 
 
 def run_mfbvar(
-    dataset: QuarterlyDataset, settings: ExperimentSettings, cfg: ExperimentConfig, plan: ForecastPlan
+    dataset: QuarterlyDataset,
+    settings: ExperimentSettings,
+    cfg: ExperimentConfig,
+    plan: ForecastPlan,
+    sink: Optional[ModelSink] = None,  # MF-BVAR (R) models are not saved
 ) -> pl.DataFrame:
     variables = dataset.resolve_variable_set(cfg.var_set, settings.variable_sets[cfg.var_set])
     origins = [origin for _, _, block in plan.segments for origin in block]
@@ -276,14 +350,18 @@ RUNNERS = {"dfm": run_dfm, "mfbvar": run_mfbvar}
 
 
 def run_task(
-    dataset: QuarterlyDataset, settings: ExperimentSettings, cfg: ExperimentConfig, plan: ForecastPlan
+    dataset: QuarterlyDataset,
+    settings: ExperimentSettings,
+    cfg: ExperimentConfig,
+    plan: ForecastPlan,
+    sink: Optional[ModelSink] = None,
 ) -> tuple[ExperimentConfig, Optional[pl.DataFrame], Optional[str]]:
     """Worker entry point: never raises, returns (config, forecasts | None, error | None)."""
     try:
         with warnings.catch_warnings(), contextlib.redirect_stdout(io.StringIO()):
             warnings.simplefilter("ignore")
             runner = RUNNERS.get(cfg.model, run_direct)
-            return cfg, runner(dataset, settings, cfg, plan), None
+            return cfg, runner(dataset, settings, cfg, plan, sink), None
     except Exception as error:  # one broken spec must not stop the night run
         return cfg, None, f"{type(error).__name__}: {error}"
 
@@ -295,6 +373,7 @@ class ExperimentRunner:
     settings: ExperimentSettings = attrs.field(factory=ExperimentSettings)
     n_jobs: int = config.RT_N_JOBS
     errors: list = attrs.field(factory=list)
+    sink: Optional[ModelSink] = None  # saves fitted models of chosen specs (future forecasts)
 
     def run(
         self, models: Iterable[str], plan: ForecastPlan, checkpoint_dir: Optional[Path] = None, resume: bool = True
@@ -332,7 +411,7 @@ class ExperimentRunner:
         )
 
         started, frames = time.time(), []
-        tasks = (delayed(run_task)(self.dataset, self.settings, cfg, plan) for cfg in configs)
+        tasks = (delayed(run_task)(self.dataset, self.settings, cfg, plan, self.sink) for cfg in configs)
         results = Parallel(n_jobs=n_jobs, return_as="generator_unordered", batch_size=1)(tasks)
         for done, (cfg, frame, error) in enumerate(results, start=1):
             if error:

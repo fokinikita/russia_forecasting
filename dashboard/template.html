@@ -916,6 +916,11 @@
         .annual-box .positive {color:#059669;}
         .annual-box .negative {color:#dc2626;}
         .annual-foot {font-size:11px;color:#9ca3af;margin-top:8px;line-height:1.45;}
+        .annual-box th a {color:#4f46e5;text-decoration:none;}
+        .annual-box td.cbr {white-space:nowrap;font-size:12.5px;}
+        .annual-box td.cbr .mark {font-size:11px;margin-left:4px;}
+        .annual-box td.cbr .in {color:#059669;}
+        .annual-box td.cbr .out {color:#d97706;}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -1716,24 +1721,45 @@
             return rows.filter(r => !r.isFact || r === lastFull);
         }
 
+        // ─── Bank of Russia medium-term forecasts (DATA.cbr, newest first, up to 3) ──────────
+        function cbrDate(iso) { return `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}`; }
+        function cbrCell(forecast, year, growth) {
+            const v = ((forecast.values || {})[state.target] || {})[String(year)];
+            if (!v) return '<td class="cbr muted">—</td>';
+            const [lo, hi, isFact] = v;
+            const text = lo === hi ? signed(lo) : `${fmt(lo)} … ${fmt(hi)}`;
+            if (isFact) return `<td class="cbr muted" title="факт / оценка ЦБ">${text} <span class="mark">факт</span></td>`;
+            const g = round(growth, 1);
+            const mark = g == null ? '' : (g >= lo && g <= hi
+                ? '<span class="mark in" title="наш прогноз внутри диапазона ЦБ">✓</span>'
+                : `<span class="mark out" title="наш прогноз ${g < lo ? 'ниже' : 'выше'} диапазона ЦБ">${g < lo ? '▼' : '▲'}</span>`);
+            return `<td class="cbr">${text}${mark}</td>`;
+        }
+
         function updateAnnual(path) {
             const rows = annualEstimates(path);
             const isConsensus = state.model === 'consensus';
             const showBand = isConsensus && rows.some(r => r.lo != null);
+            const cbr = (DATA.cbr || []).slice(0, 3);
             document.getElementById('annualHead').innerHTML = `<tr><th>Год</th><th>Темп роста, %</th>
                 ${showBand ? `<th>Среднее топ-${DATA.meta.top_k}, %</th><th>Диапазон 25–75%, %</th>` : ''}
+                ${cbr.map(f => `<th title="Среднесрочный прогноз Банка России, базовый сценарий"><a href="${f.url}" target="_blank" rel="noopener">ЦБ ${cbrDate(f.date)}</a></th>`).join('')}
                 <th>Кварталы: факт</th><th>Кварталы: прогноз</th></tr>`;
             document.getElementById('annualBody').innerHTML = rows.map(r => `<tr>
                     <td><strong>${r.year}</strong></td>
                     <td class="num ${r.growth >= 0 ? 'positive' : 'negative'}">${signed(r.growth)}</td>
                     ${showBand ? `<td>${r.mean == null ? '—' : signed(r.mean)}</td><td>${r.lo == null ? '—' : `${fmt(r.lo)} … ${fmt(r.hi)}`}</td>` : ''}
+                    ${cbr.map(f => cbrCell(f, r.year, r.isFact ? null : r.growth)).join('')}
                     <td class="muted">${r.factQ || '—'}</td>
                     <td class="muted">${r.fcQ ? r.fcQ + ' кв.' : '— (факт)'}</td>
                 </tr>`).join('');
-            document.getElementById('annualFoot').textContent = showBand
+            const cbrNote = cbr.length
+                ? ` ЦБ — диапазон среднесрочного прогноза Банка России (базовый сценарий, прирост к предыдущему году, %) из ${cbr.length} последних публикаций; ✓ — наш прогноз внутри диапазона, ▲/▼ — выше/ниже.`
+                : '';
+            document.getElementById('annualFoot').textContent = (showBand
                 ? `Темп роста консенсуса — по медиане ${DATA.meta.top_k} лучших спецификаций в каждом квартале; среднее — по их среднему. `
                   + `Диапазон 25–75% — если бы все прогнозные кварталы года оказались на нижней (верхней) границе квартального диапазона 25–75% прогнозов ${DATA.meta.top_k} лучших спецификаций.`
-                : 'Опубликованные кварталы — факт, остальные — прогноз выбранной модели.';
+                : 'Опубликованные кварталы — факт, остальные — прогноз выбранной модели.') + cbrNote;
 
             const current = rows.find(r => r.fcQ);
             if (current) {

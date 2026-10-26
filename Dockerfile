@@ -1,5 +1,7 @@
-# One image for the whole pipeline: Python orchestrates everything, R is only a worker that
-# Python calls (Rscript) for MF-BVAR. See README, section "Docker".
+# One image for the whole service: Airflow (own virtualenv) schedules the weekly run, every task calls
+# the project code (/opt/venv) which uses R (Rscript) as a worker for MF-BVAR. See README, "Сервис".
+#
+#   docker compose up -d --build            # Airflow on http://<server>:8095, schedule Mon 05:00 MSK
 #
 #   docker build -t russia-forecasting .
 #   docker run --rm -v "$PWD/data:/app/data" -v "$PWD/results:/app/results" \
@@ -42,14 +44,22 @@ RUN uv python install 3.12 \
     && uv pip install --no-cache -r /tmp/requirements-docker.txt \
     && rm /tmp/requirements-docker.txt
 
+# --------------------------------------------------------------- Airflow
+# separate virtualenv: Airflow pins its own dependency versions (constraints file), the models keep theirs
+ARG AIRFLOW_VERSION=3.1.8
+ENV AIRFLOW_HOME=/opt/airflow
+RUN uv venv --python 3.12 /opt/airflow-venv     && uv pip install --no-cache --python /opt/airflow-venv/bin/python         "apache-airflow[amazon]==${AIRFLOW_VERSION}"         --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-3.12.txt"     && mkdir -p /opt/airflow
+
 # ------------------------------------------------------------------ code
 WORKDIR /app
 COPY . /app
 RUN chmod -R a+rwX /app && mkdir -p /tmp/matplotlib && chmod 1777 /tmp/matplotlib
 
 # fails the build early if Python or R dependencies are broken
-RUN python -c "import catboost, ngboost, pytorch_tabnet, statsmodels, polars, torch; print('python ok')" \
+RUN python -c "import catboost, ngboost, pytorch_tabnet, statsmodels, polars, torch, boto3, pdfplumber, service.cli; print('python ok')"     && /opt/airflow-venv/bin/python orchestration/dags/russia_forecasting.py && echo "dag ok" \
     && Rscript -e "suppressPackageStartupMessages(library(mfbvar)); cat('mfbvar', as.character(packageVersion('mfbvar')), 'ok\n')" \
     && python -m pytest tests -q -p no:cacheprovider
 
-CMD ["python", "-m", "pipelines.run_realtime"]
+RUN chmod +x docker/airflow-entrypoint.sh
+EXPOSE 8080
+CMD ["docker/airflow-entrypoint.sh"]

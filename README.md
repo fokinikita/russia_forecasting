@@ -150,6 +150,67 @@ R-пакет `mfbvar` 0.5.6 удалён из CRAN, ставится из `mfbva
   (`RT_FUTURE_FALLBACK_TO_PREVIOUS_RUN`, колонка `source_run` в `future/forecasts.csv`).
 * Локально на Windows: `set RSCRIPT=C:\Program Files\R\R-4.1.0\bin\Rscript.exe` (или Rscript в PATH).
 
+## Сервис: еженедельный запуск (Airflow + S3)
+
+Каждый **понедельник в 05:00 МСК** Airflow запускает весь цикл, все промежуточные результаты
+сохраняются в S3 в папки с датой запуска. Всё работает в **одном контейнере**: Airflow
+(`airflow standalone`, SQLite только для состояний запусков) + модели Python и R.
+
+```text
+resolve_run_date ─┬─ cbr_forecasts ───────────────────────────────────────────────┐
+                  └─ collect_data ─ backtest_gb ─ backtest_ngb ─ backtest_tabnet   │
+                       ─ backtest_dfm ─ backtest_mfbvar ─ evaluate_backtest       │
+                       ─ forecast_future ──────────────────────────────── build_dashboard
+```
+
+| шаг | что делает | куда пишет в S3 |
+|---|---|---|
+| `collect_data` | данные data.iep.ru (если сайт недоступен — последние из S3) | `raw_data/<дата>/quarterly.parquet`, `monthly`, `daily`, `raw_*`, `metadata` |
+| `backtest_<модель>` | псевдо real-time бэктест одной модели | `retro_metrics/<дата>/forecasts_<модель>.parquet` |
+| `evaluate_backtest` | метрики, рейтинг, автовыбор спецификаций | `retro_metrics/<дата>/metrics.parquet`, `selected_specs`, `best`, `ranking`, `rolling`, `errors`, `run_info.json` |
+| `forecast_future` | прогноз на 8 кварталов, сохраняет обученные модели выбранных спецификаций | `forecasts/<дата>/…`, `models/<дата>/<модель>/…` |
+| `cbr_forecasts` | проверяет https://www.cbr.ru/dkp/cal_mp/, скачивает и разбирает новые «Среднесрочные прогнозы» | `cbr_forecasts/pdf/`, `cbr_forecasts/all_forecasts.parquet`, `cbr_forecasts/<дата>/` |
+| `build_dashboard` | HTML-дашборд + сравнение с 3 последними прогнозами ЦБ | `dashboard/<дата>/macro_dashboard.html`, `dashboard/latest/` |
+
+Также: `history/metrics_history.parquet`, `history/forecasts_history.parquet` (все запуски),
+`airflow_logs/` (логи задач). Таблицы хранятся в parquet. Каждый шаг сам забирает входные данные из S3,
+поэтому упавшую задачу можно просто перезапустить (Clear в интерфейсе). Если упал бэктест одной модели,
+остальные считаются, а оценка идёт по моделям, которые досчитались. Готовая ссылка на дашборд
+(действует 7 дней) — в логе задачи `build_dashboard`.
+
+**Прогноз ЦБ в дашборде.** В таблице «Темп роста за календарный год» добавлены столбцы с диапазонами
+базового сценария трёх последних среднесрочных прогнозов Банка России (ВВП, потребление домашних хозяйств,
+валовое накопление, валовое накопление основного капитала; прирост к предыдущему году).
+✓ — наш прогноз внутри диапазона ЦБ, ▲/▼ — выше/ниже.
+
+### Развернуть на сервере
+
+```bash
+git clone git@github.com:fokinikita/russia_forecasting.git && cd russia_forecasting
+git checkout main_auto_pipeline
+cp .env.example .env && nano .env      # ключи S3, пароль Airflow, лимиты ресурсов
+docker compose up -d --build           # первая сборка ~15-20 минут (компиляция mfbvar)
+```
+
+Интерфейс Airflow: `http://<сервер>:8095`, пользователь `admin`, пароль `AIRFLOW_ADMIN_PASSWORD` из `.env`.
+Обновить код: `git pull && docker compose up -d --build`.
+
+Ресурсы (`.env`): `MEM_LIMIT` и `CPUS` — жёсткие лимиты контейнера, `N_JOBS` / `MFBVAR_N_JOBS` /
+`DFM_N_JOBS` — число параллельных процессов моделей. Задачи DAG выполняются по одной.
+
+**Ручной запуск** — «Trigger DAG w/ config»: `run_date` (по умолчанию сегодня), `profile = quick`
+(маленькая сетка, ~15-30 минут, для проверки сервиса), `prefix = _smoke` (писать в отдельную папку бакета),
+`models`, `force` (пересчитать то, что уже есть в S3). Отдельный шаг без Airflow:
+
+```bash
+docker compose exec airflow python -m service.cli check                       # доступ к S3
+docker compose exec airflow python -m service.cli backtest --model gb --date 2026-11-02
+docker compose exec airflow python -m service.cli dashboard --date 2026-11-02
+```
+
+Код сервиса: `service/` (`storage.py` — S3, `layout.py` — структура папок, `stages.py` — шаги,
+`cbr.py` — прогнозы ЦБ, `cli.py`), DAG — `orchestration/dags/russia_forecasting.py`.
+
 ## Docker (Linux-сервер)
 
 **Один образ на Python и R** (а не два контейнера): R здесь только воркер, который Python вызывает через
@@ -159,19 +220,13 @@ R-пакет `mfbvar` 0.5.6 удалён из CRAN, ставится из `mfbva
 RcppArmadillo 0.11.4.2.1 и stochvol 3.2.0 закреплены (с ними mfbvar точно собирается), mfbvar — из
 tar.gz, Python 3.12 через uv, torch CPU-only, версии библиотек — как в рабочем окружении.
 
+В этом же образе установлен Airflow (отдельный virtualenv `/opt/airflow-venv`, у Airflow свои версии
+зависимостей), см. раздел «Сервис». Старый ручной запуск всего цикла без S3 тоже работает:
+
 ```bash
-docker compose build                                   # ~10-15 минут в первый раз (компиляция mfbvar)
-docker compose run --rm forecasting                    # полный цикл: данные -> бэктест -> прогноз -> дашборд
-docker compose run --rm forecasting python -m pipelines.run_realtime --models mfbvar --no-refresh
-docker compose run --rm forecasting python -m pytest tests -q
-```
-
-`data/`, `results/`, `dashboard/` монтируются с хоста, результаты остаются на сервере. Файлы создаются
-от пользователя `UID:GID` (по умолчанию 1000:1000, `export UID GID` для своих). Число процессов:
-`N_JOBS` (все модели) и `MFBVAR_N_JOBS` (параллельные R-процессы). Для ночного запуска по cron:
-
-```cron
-0 3 * * * cd /path/to/russia_forecasting && docker compose run --rm forecasting >> results/cron.log 2>&1
+docker compose run --rm airflow python -m pipelines.run_realtime                 # данные -> бэктест -> прогноз -> дашборд
+docker compose run --rm airflow python -m pipelines.run_realtime --models mfbvar --no-refresh
+docker compose run --rm airflow python -m pytest tests -q
 ```
 
 ## Структура проекта
@@ -182,6 +237,8 @@ russia_forecasting/
 ├── data_iep/               # скачивание и преобразование данных data.iep.ru
 ├── forecasting/            # модели, бэктест, метрики, выбор спецификации, дашборд
 ├── pipelines/              # точки входа: run_realtime, build_dashboard
+├── service/                # еженедельный сервис: шаги, S3, прогнозы ЦБ
+├── orchestration/dags/     # DAG Airflow
 ├── dashboard/              # шаблон и готовый HTML-дашборд
 ├── data/iep/               # сохранённые данные
 ├── results/                # результаты запусков и история

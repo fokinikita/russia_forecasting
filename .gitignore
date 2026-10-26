@@ -41,3 +41,6 @@ DeepGBM/
 GBNN/
 deepgbm_env/
 .pytest_cache/
+
+# secrets of the service (S3 keys, Airflow password)
+.env

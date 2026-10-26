@@ -15,3 +15,6 @@ attrs==25.4.0
 requests==2.34.2
 matplotlib==3.10.8
 pytest==9.1.1
+# service (S3, Bank of Russia PDFs)
+boto3==1.40.0
+pdfplumber==0.11.4

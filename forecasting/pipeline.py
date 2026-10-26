@@ -19,6 +19,7 @@ Layout of results (config.RT_RESULTS_DIR):
     runs/<run_id>/future/consensus.csv                 median of the top-K backtest specs (recommended)
     runs/<run_id>/future/selected.csv                  forecasts of the auto-chosen spec of every model
                                                        (model_rank = 1 -> "auto" forecast)
+    runs/<run_id>/models/<model>/                      fitted models of the auto-chosen specs (future stage)
     metrics_history.csv                                metrics of every run (quality across runs)
     forecasts_history.csv                              consensus and best-spec forecasts of every run
 """
@@ -44,6 +45,7 @@ from forecasting.experiment import (
     ExperimentRunner,
     ExperimentSettings,
     ForecastPlan,
+    ModelSink,
 )
 
 logger = logging.getLogger(__name__)
@@ -139,12 +141,29 @@ class RealTimePipeline:
         return summary
 
     # ------------------------------------------------------------ future
-    def forecast_future(self, resume: bool = True) -> pl.DataFrame:
+    @property
+    def models_dir(self) -> Path:
+        return self.run_dir / "models"
+
+    def _model_sink(self) -> Optional[ModelSink]:
+        """Fitted models of the auto-chosen spec of every model x target x availability are kept."""
+        path = self.run_dir / "backtest" / "selected_specs.csv"
+        if not path.exists():
+            return None
+        selected = pl.read_csv(path)
+        keys = {
+            "/".join([r["model"], str(r["train_start"]), r["var_set"], r["features_type"], f"a{r['availability']}", r["target"]])
+            for r in selected.iter_rows(named=True)
+        }
+        return ModelSink(self.models_dir, frozenset(keys))
+
+    def forecast_future(self, resume: bool = True, save_models: bool = True) -> pl.DataFrame:
         dataset = self.dataset or self.load_dataset()
         plan = ForecastPlan.future(dataset)
         out_dir = self.run_dir / "future"
         logger.info(f"future: origin {plan.segments[0][0]}, targets known up to {plan.segments[0][1]}")
-        runner = ExperimentRunner(dataset, self.settings, n_jobs=self.n_jobs)
+        sink = self._model_sink() if save_models else None
+        runner = ExperimentRunner(dataset, self.settings, n_jobs=self.n_jobs, sink=sink)
         forecasts = runner.run(self.models, plan, checkpoint_dir=out_dir, resume=resume)
         self._save_errors(runner.errors, out_dir / "failed_specs.csv")
         return self._save_future(forecasts, out_dir)

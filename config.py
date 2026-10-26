@@ -48,8 +48,8 @@ RT_VARIABLE_SETS: Final[dict[str, Optional[list[str]]]] = {
     "all": None,  # every collected monthly variable
 }
 RT_MODELS: Final[list[str]] = ["gb", "ngb", "tabnet", "dfm", "mfbvar"]
-RT_N_JOBS: Final[int] = 7  # parallel worker processes
-RT_DFM_N_JOBS: Final[int] = 3  # DFM on all variables needs ~2-4 GB per process
+RT_N_JOBS: Final[int] = int(os.environ.get("N_JOBS", 7))  # parallel worker processes
+RT_DFM_N_JOBS: Final[int] = int(os.environ.get("DFM_N_JOBS", 3))  # DFM on all variables needs ~2-4 GB per process
 RT_CONSENSUS_TOP_K: Final[int] = 10  # future consensus = median of the K best backtest specs
 RT_DFM_FACTORS: Final[int] = 2
 RT_DFM_FACTOR_ORDER: Final[int] = 1

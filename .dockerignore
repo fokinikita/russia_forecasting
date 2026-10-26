@@ -11,3 +11,4 @@ GBNN/
 .pt_tmp/
 # mounted as volumes at run time (see docker-compose.yml)
 results/
+.env

@@ -81,6 +81,9 @@ class DashboardBuilder:
     as_of: date = attrs.field(factory=date.today)
     top_k: int = config.RT_CONSENSUS_TOP_K
     history_start: int = 2000
+    # Bank of Russia medium-term forecasts to compare with (newest first), see service/cbr.py:
+    # [{"date": "2026-10-23", "url": ..., "values": {"gdp": {"2026": [lo, hi, is_fact], ...}, ...}}]
+    cbr: list = attrs.field(factory=list)
 
     # ------------------------------------------------------------ inputs
     def _levels(self) -> pl.DataFrame:
@@ -270,6 +273,7 @@ class DashboardBuilder:
             },
             "test_dates": [d.isoformat() for d in test_dates],
             "targets": payload_targets,
+            "cbr": self.cbr,
         }
 
     def write(self, out_path: Path | str = Path("dashboard") / "macro_dashboard.html") -> Path:
@@ -290,6 +294,7 @@ def build_dashboard(
     as_of: Optional[date] = None,
     out_path: Path | str = Path("dashboard") / "macro_dashboard.html",
     results_dir: str = config.RT_RESULTS_DIR,
+    cbr: Optional[list] = None,
 ) -> Path:
     run = RunResults(Path(results_dir) / "runs" / run_id) if run_id else RunResults.latest(results_dir)
-    return DashboardBuilder(run, as_of=as_of or date.today()).write(out_path)
+    return DashboardBuilder(run, as_of=as_of or date.today(), cbr=cbr or []).write(out_path)
