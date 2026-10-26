@@ -64,9 +64,9 @@ class StageContext:
     # ----------------------------------------------------------- shared pulls
     def pull_raw(self) -> None:
         """IEP data of this run date -> data/iep (the forecasting code reads it there)."""
-        paths = self.storage.download_dir(self.layout.s3(L.RAW), self.layout.data_dir)
+        paths = self.storage.download_dir(self.s3(L.RAW), self.layout.data_dir)
         if not any(p.name == "quarterly.parquet" for p in paths):
-            raise StageError(f"no raw data for {self.run_date} in {self.storage.uri(self.storage.key(L.RAW, self.run_date))}, run 'collect' first")
+            raise StageError(f"no raw data for {self.run_date} in {self.storage.uri(self.s3(L.RAW))}, run 'collect' first")
 
     def pull_history(self, name: str) -> None:
         self.storage.download(self.storage.key(L.HISTORY, f"{name}.parquet"), self.layout.results_dir)
