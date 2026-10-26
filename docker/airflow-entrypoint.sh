@@ -12,6 +12,8 @@ export S3_ENDPOINT_URL="${S3_ENDPOINT_URL:-https://s3.twcstorage.ru}"
 export S3_REGION="${S3_REGION:-ru-1}"
 
 AF=/opt/airflow-venv/bin
+# standalone starts its components as `airflow ...`; appended, so `python` stays the models' environment
+export PATH="$PATH:$AF"
 mkdir -p "$AIRFLOW_HOME"
 
 # S3 connection for remote task logs (JSON connection format)
