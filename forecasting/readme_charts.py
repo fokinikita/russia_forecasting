@@ -173,8 +173,8 @@ class Forecast:
 
     def backtest_chart(self) -> str:
         # h = 4 under h = 1 under the fact; a horizon with gaps is left out (Mermaid lines cannot have gaps)
-        lines = [Line(self.test[4], H4_COLOR), Line(self.test[1], FORECAST_COLOR), Line(self.test_fact, FACT_COLOR)]
-        lines = [line for line in lines if None not in line.values]
+        lines = [Line(self.test.get(h, [None]), color) for h, color in ((4, H4_COLOR), (1, FORECAST_COLOR))]
+        lines = [line for line in lines + [Line(self.test_fact, FACT_COLOR)] if None not in line.values]
         chart = MermaidChart(
             title=f"{self.target_name}: ретроспектива, г/г, %",
             y_label="г/г, %",
@@ -261,7 +261,7 @@ class ReadmeCharts:
             test_dates=[date.fromisoformat(d) for d in self.payload["test_dates"]],
             test_fact=to_pct(target["test_fact"]),
             future=future,
-            test={h: to_pct(spec["test"][h - 1]) for h in RETRO_HORIZONS},
+            test={h: to_pct(spec["test"][h - 1]) for h in RETRO_HORIZONS if h <= len(spec["test"])},
             metrics=spec["metrics"],
             naive_mae={int(h): v["mae"] for h, v in target["naive"].items()},
             n_fact=self.n_fact,
@@ -283,12 +283,9 @@ class ReadmeCharts:
         return self._details(f"<b>{MODELS[fc.model]}</b>", _indent(body), is_open)
 
     def markdown(self) -> str:
-        meta = self.payload["meta"]
-        created = date.fromisoformat(meta["created"][:10])
         parts = [
-            f"Кликабельная версия дашборда прямо в README: выберите показатель → модель → вкладку. "
-            f"Данные — пример одного прогона (расчёт от {created:%d.%m.%Y}, не обновляется). "
-            "Кварталы со `*` — прогноз, оранжевые линии — диапазон 25–75% прогнозов спецификаций."
+            "Нажимайте: показатель → модель → вкладка. Кварталы со `*` — прогноз, "
+            "оранжевые линии — диапазон 25–75% прогнозов спецификаций, графики можно приближать кнопками справа."
         ]
         for i, target in enumerate(self.payload["targets"].values()):
             models = [fc for model in MODELS if (fc := self.forecast(target, model)) is not None]
