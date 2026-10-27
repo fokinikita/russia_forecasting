@@ -87,7 +87,7 @@ class ReadmeCharts:
     """Reads the dashboard payload and writes the chart block between markers in README."""
 
     payload: dict
-    n_fact: int = 12  # fact quarters shown before the forecast
+    n_fact: int = 8  # fact quarters before the forecast (more do not fit as x-axis labels)
 
     @classmethod
     def from_dashboard(cls, html_path: Path | str, **kwargs) -> "ReadmeCharts":
