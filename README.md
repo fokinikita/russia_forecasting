@@ -4,6 +4,10 @@
 данные скачиваются с data.iep.ru, модели проверяются на псевдо-реальном бэктесте последних 3 лет,
 для каждого показателя автоматически выбирается лучшая модель и спецификация, результаты выводятся в дашборд.
 
+### 📊 [Открыть интерактивный дашборд](https://fokinikita.github.io/russia_forecasting/dashboard/macro_dashboard.html)
+
+[![Дашборд](docs/dashboard_preview.png)](https://fokinikita.github.io/russia_forecasting/dashboard/macro_dashboard.html)
+
 > Ветка `main_auto_pipeline`. Исходный эксперимент на вручную собранных excel-таблицах
 > (`main.py`, `models/`, `preds/`, `mfbvar.R`) остался в ветке `main`.
 
