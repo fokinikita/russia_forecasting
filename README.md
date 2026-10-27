@@ -6,6 +6,9 @@
 
 ### 📊 [Открыть интерактивный дашборд](https://fokinikita.github.io/russia_forecasting/dashboard/macro_dashboard.html)
 
+> **Пример:** дашборд одного из прогонов (расчёт от 23.10.2026). Он статичный и автоматически не обновляется;
+> актуальные дашборды еженедельный сервис сохраняет в S3 (см. раздел про Airflow ниже).
+
 [![Дашборд](docs/dashboard_preview.png)](https://fokinikita.github.io/russia_forecasting/dashboard/macro_dashboard.html)
 
 > Ветка `main_auto_pipeline`. Исходный эксперимент на вручную собранных excel-таблицах
