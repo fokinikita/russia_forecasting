@@ -31,6 +31,8 @@ logger = logging.getLogger(__name__)
 SPEC_KEY_COLUMNS = ["model", "train_start", "var_set", "features_type", "availability"]
 TEMPLATE_PATH = Path(__file__).resolve().parent.parent / "dashboard" / "template.html"
 DATA_PLACEHOLDER = "/*__DASHBOARD_DATA__*/null"
+# Ministry of Economic Development forecasts, collected by hand in the same format as the CBR ones
+MINEK_PATH = TEMPLATE_PATH.parent / "minek_forecasts.json"
 # JS libraries are inlined from local copies, so the page works offline as a single file
 VENDOR_DIR = TEMPLATE_PATH.parent / "vendor"
 VENDOR_SCRIPTS = {
@@ -53,11 +55,24 @@ def _inline_scripts(html: str) -> str:
     return html
 
 TARGET_NAMES = {
-    "gdp": "ВВП в постоянных ценах",
-    "cons": "Потребление домашних хозяйств в постоянных ценах",
-    "inv": "Валовое накопление в постоянных ценах",
-    "inv_cap": "Валовое накопление основного капитала в постоянных ценах",
+    "gdp": "ВВП в постоянных ценах 2021 г.",
+    "cons": "Потребление домашних хозяйств в постоянных ценах 2021 г.",
+    "inv": "Валовое накопление в постоянных ценах 2021 г.",
+    "inv_cap": "Валовое накопление основного капитала в постоянных ценах 2021 г.",
 }
+
+
+def load_minek(path: Path = MINEK_PATH) -> list:
+    """Hand-collected Ministry of Economic Development forecasts; empty list if the file is missing or empty."""
+    if not path.exists():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8") or "[]")
+    except json.JSONDecodeError as e:
+        logger.warning(f"{path}: {e}, the dashboard is built without the Ministry forecasts")
+        return []
+    forecasts = data.get("forecasts", []) if isinstance(data, dict) else data
+    return sorted(forecasts, key=lambda f: f.get("date", ""), reverse=True)
 
 
 def availability_for(as_of: date) -> int:
@@ -84,6 +99,8 @@ class DashboardBuilder:
     # Bank of Russia medium-term forecasts to compare with (newest first), see service/cbr.py:
     # [{"date": "2026-10-23", "url": ..., "values": {"gdp": {"2026": [lo, hi, is_fact], ...}, ...}}]
     cbr: list = attrs.field(factory=list)
+    # Ministry of Economic Development forecasts (newest first), same format; by default read from MINEK_PATH
+    minek: list = attrs.field(factory=lambda: load_minek())
 
     # ------------------------------------------------------------ inputs
     def _levels(self) -> pl.DataFrame:
@@ -273,7 +290,8 @@ class DashboardBuilder:
             },
             "test_dates": [d.isoformat() for d in test_dates],
             "targets": payload_targets,
-            "cbr": self.cbr,
+            "cbr": self.cbr[:1],
+            "minek": self.minek[:1],
         }
 
     def write(self, out_path: Path | str = Path("dashboard") / "macro_dashboard.html") -> Path:

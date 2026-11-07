@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Макропрогноз</title>
+    <title>Макроэкономический прогноз</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
@@ -295,6 +295,8 @@
             font-weight: 400;
             color: #9ca3af;
         }
+
+        .price-base {font-size:10.5px;font-weight:400;color:#9ca3af;text-transform:none;letter-spacing:0;white-space:nowrap;}
 
         /* Model Metrics Table */
         .model-metrics-container {
@@ -870,7 +872,7 @@
         .quality-indicator.bad {color:#991b1b;}
         .data-table .compare-col {color:#db2777;}
         .empty-note {padding:40px 0;text-align:center;color:#9ca3af;font-size:14px;}
-        .control-tabs {grid-template-columns:2.1fr 1.3fr 1fr 1fr 1.1fr 1.3fr;}
+        .control-tabs {grid-template-columns:3fr 1.3fr 1fr 1fr 1.1fr 1.3fr;}
         .control-tab label {display:flex;align-items:center;gap:6px;}
         .control-tab .help-icon, .info-help {display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#e5e7eb;color:#6b7280;font-size:9.5px;font-weight:700;cursor:help;letter-spacing:0;}
         .control-tab .help-icon:hover {background:#4f46e5;color:#fff;}
@@ -879,9 +881,9 @@
         .avail-info .avail-sub {font-size:11px;color:#64748b;margin-top:2px;}
 
         .info-panel {background:#fff;border-radius:16px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.04);}
-        .info-panel summary {padding:16px 24px;cursor:pointer;font-weight:600;font-size:14px;color:#1a1a2e;list-style:none;display:flex;justify-content:space-between;align-items:center;}
+        .info-panel summary {padding:20px 24px;cursor:pointer;font-weight:700;font-size:18px;color:#1a1a2e;list-style:none;display:flex;justify-content:space-between;align-items:center;}
         .info-panel summary::-webkit-details-marker {display:none;}
-        .info-panel summary .chev {color:#9ca3af;font-size:12px;font-weight:500;}
+        .info-panel summary .chev {color:#4f46e5;font-size:15px;font-weight:700;white-space:nowrap;margin-left:12px;}
         .info-panel[open] summary {border-bottom:1px solid #f0f2f5;}
         .info-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;padding:18px 24px 22px;}
         .info-card {background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.55;color:#334155;}
@@ -895,6 +897,7 @@
         @media(max-width:560px){.control-tabs{grid-template-columns:1fr;}.info-card dl{grid-template-columns:1fr;}}
 
         .multi-select {position:relative;}
+        .control-tab.disabled {opacity:.45;pointer-events:none;}
         .multi-select-btn {width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172554;font:600 13px inherit;font-family:inherit;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;}
         .multi-select-btn::after {content:'▾';color:#64748b;font-size:11px;}
         .multi-select-panel {display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:240px;background:#fff;border:1px solid #dbe3f3;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:8px;z-index:50;}
@@ -917,6 +920,11 @@
         .annual-box .negative {color:#dc2626;}
         .annual-foot {font-size:11px;color:#9ca3af;margin-top:8px;line-height:1.45;}
         .annual-box th a {color:#4f46e5;text-decoration:none;}
+        .article-link {display:block;margin:-12px 0 20px;padding:12px 18px;background:#fff;border-radius:12px;
+            border-left:4px solid #4f46e5;color:#374151;font-size:13.5px;line-height:1.5;text-decoration:none;
+            box-shadow:0 1px 3px rgba(0,0,0,.05);}
+        .article-link:hover {color:#4f46e5;background:#f5f3ff;}
+        .article-link em {font-style:normal;font-weight:600;}
         .annual-box td.cbr {white-space:nowrap;font-size:12.5px;}
         .annual-box td.cbr .mark {font-size:11px;margin-left:4px;}
         .annual-box td.cbr .in {color:#059669;}
@@ -931,8 +939,8 @@
         <!-- Header -->
         <header class="header">
             <div class="header-left">
-                <h1>📊 Макропрогноз</h1>
-                <p>Краткосрочное прогнозирование ВВП и компонентов</p>
+                <h1>📊 Макроэкономический прогноз</h1>
+                <p>Краткосрочное прогнозирование ВВП и его основных компонентов по использованию</p>
             </div>
             <div class="header-right">
                 <div class="update-badge">
@@ -958,6 +966,13 @@
                 </div>
             </div>
         </div>
+
+        <!-- Methodology article -->
+        <a class="article-link" href="https://www.vopreco.ru/jour/article/view/5885" target="_blank" rel="noopener">
+            📄 Подробно с методологией прогнозирования и используемыми моделями можно ознакомиться в статье
+            <em>Фокин Н.Д. Модели для наукастинга и прогнозирования компонент ВВП по использованию в реальном времени.
+            Вопросы экономики. 2026;(9):116-143.</em>
+        </a>
 
         <!-- Explanations -->
         <details class="info-panel" id="infoPanel">
@@ -1023,9 +1038,10 @@
                     <div class="chart-title" id="chartTitle">—</div>
                     <div class="chart-actions">
                         <div class="seg" id="viewSeg">
-                            <button data-view="level" class="active">Уровни</button>
-                            <button data-view="yoy">Г/г, %</button>
-                            <button data-view="test">Ретроспектива</button>
+                            <button data-view="yoy" class="active">Г/г, %</button>
+                            <button data-view="level">Уровни</button>
+                            <button data-view="test">Ретроспектива (по горизонтам)</button>
+                            <button data-view="points">Ретроспектива (по тестовым точкам)</button>
                         </div>
                         <select id="periodSelect">
                             <option value="5">5 лет</option>
@@ -1113,10 +1129,10 @@
         };
         const SELECTED_MODELS = ['consensus', 'best'];
         const TARGET_OPTIONS = {
-            gdp: 'ВВП в постоянных ценах',
-            cons: 'Потребление дом. хозяйств в пост. ценах',
-            inv: 'Валовое накопление в пост. ценах',
-            inv_cap: 'Валовое накопление осн. капитала в пост. ценах',
+            gdp: 'ВВП в постоянных ценах 2021 г.',
+            cons: 'Потребление домашних хозяйств в постоянных ценах 2021 г.',
+            inv: 'Валовое накопление в постоянных ценах 2021 г.',
+            inv_cap: 'Валовое накопление основного капитала в постоянных ценах 2021 г.',
         };
         const VARSET_NAMES = { short: 'короткий', medium: 'средний', all: 'полный' };
         const FTYPE_NAMES = { classic: 'классические', rolling: 'скользящие' };
@@ -1289,7 +1305,7 @@
 
         // ─── State ─────────────────────────────────────────────────────────────────
         const state = { target: 'gdp', model: 'consensus', sample: '2000', varset: 'all', ftype: 'classic',
-                        avail: 1, compares: [], view: 'level', horizon: 1, period: '10' };
+                        avail: 1, compares: [], view: 'yoy', horizon: 1, period: '10' };
         let chartInstance = null;
         let tableRows = [];
         let chartRows = [];
@@ -1435,7 +1451,12 @@
         function setView(view) {
             state.view = view;
             document.querySelectorAll('#viewSeg button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
-            document.getElementById('periodSelect').style.display = view === 'test' ? 'none' : '';
+            document.getElementById('periodSelect').style.display = (view === 'test' || view === 'points') ? 'none' : '';
+            // one model only on the test-point view, otherwise there are too many points
+            const compareTab = document.getElementById('compareSelect').closest('.control-tab');
+            compareTab.classList.toggle('disabled', view === 'points');
+            compareTab.title = view === 'points' ? 'На вкладке «по тестовым точкам» показывается только одна модель' : '';
+            if (view === 'points') document.getElementById('compareSelect').classList.remove('open');
             document.getElementById('horizonPicker').classList.toggle('show', view === 'test');
             document.getElementById('excelButton').title = `Скачать Excel — ${EXPORT_TITLES[view]}`;
             update();
@@ -1465,7 +1486,7 @@
             const fact = lastFact();
             const factCls = fact.yoy >= 0 ? 'positive' : 'negative';
             document.getElementById('metricCurrent').innerHTML =
-                `${fmt(fact.level / 1000, 2)} <span class="sub">трлн ₽</span> <span class="change ${factCls}">${signed(fact.yoy)}% г/г</span>`;
+                `${fmt(fact.level / 1000, 2)} <span class="sub">трлн ₽ <span class="price-base">(цены 2021 г.)</span></span> <span class="change ${factCls}">${signed(fact.yoy)}% г/г</span>`;
             document.getElementById('metricLastDate').textContent = qLong(fact.date);
 
             const next = path && path[0];
@@ -1473,7 +1494,7 @@
             if (next && next.level != null) {
                 const cls = next.yoy >= 0 ? 'positive' : 'negative';
                 document.getElementById('metricForecast').innerHTML =
-                    `${fmt(next.level / 1000, 2)} <span class="sub">трлн ₽</span> <span class="change ${cls}">${signed(next.yoy)}% г/г</span>`;
+                    `${fmt(next.level / 1000, 2)} <span class="sub">трлн ₽ <span class="price-base">(цены 2021 г.)</span></span> <span class="change ${cls}">${signed(next.yoy)}% г/г</span>`;
             } else {
                 document.getElementById('metricForecast').innerHTML = '— <span class="sub">нет прогноза</span>';
             }
@@ -1560,7 +1581,7 @@
             }
             compares.forEach(c => datasets.push(lineDataset(`Сравнение — ${MODELS[c.model].name}`, anchored(c.path), COMPARE_COLORS[c.model],
                 { borderDash: [3, 3], borderWidth: 2, pointRadius: 2 })));
-            const unitName = isLevel ? 'Уровень, трлн ₽' : 'Темп роста г/г, %';
+            const unitName = isLevel ? 'Уровень, трлн ₽ (цены 2021 г.)' : 'Темп роста г/г, %';
             chartRows = [
                 ...history.map(r => ({ 'Период': qShort(r.date), 'Тип': 'факт', [unitName]: round(value(r)) })),
                 ...(path || []).map((r, i) => ({
@@ -1595,6 +1616,40 @@
             return { labels, datasets, forecastStart: -1, unit: 'темп роста г/г, %' };
         }
 
+        // Every test quarter: the fact and the 8 forecasts of the chosen model made 1…8 quarters before it,
+        // a distinct colour and marker shape per horizon
+        const HORIZON_COLORS = ['#dc2626', '#f59e0b', '#16a34a', '#0891b2', '#7c3aed', '#db2777', '#65a30d', '#78350f'];
+        const HORIZON_SHAPES = ['circle', 'triangle', 'star', 'rect', 'rectRot', 'crossRot', 'triangle', 'star'];
+        const HORIZON_ROTATION = [0, 0, 0, 0, 0, 0, 180, 0];
+        function buildPointsChart(spec) {
+            const t = DATA.targets[state.target];
+            const labels = DATA.test_dates.map(qShort);
+            const fact = t.test_fact.map(pct);
+            const datasets = [lineDataset('Факт', fact, COLORS.fact, { pointRadius: 3 })];
+            chartRows = [];
+            for (let h = 1; h <= DATA.meta.horizon; h++) {
+                const pred = spec ? spec.test[h - 1].map(pct) : DATA.test_dates.map(() => null);
+                const origins = DATA.test_dates.map(d => qShort(addQuarters(d, -(h - 1))));
+                const built = h === 1 ? 'построен в целевом квартале' : `построен за ${h - 1} кв. до целевого`;
+                datasets.push({
+                    label: `h = ${h} · ${built}`, data: pred, origins, horizon: h,
+                    showLine: false, pointRadius: 6, pointHoverRadius: 8,
+                    pointStyle: HORIZON_SHAPES[(h - 1) % 8], pointRotation: HORIZON_ROTATION[(h - 1) % 8],
+                    // star / cross markers are drawn by their outline only, so the border carries the colour
+                    borderColor: HORIZON_COLORS[(h - 1) % 8], borderWidth: 2,
+                    pointBorderColor: HORIZON_COLORS[(h - 1) % 8], pointBorderWidth: 2,
+                    backgroundColor: HORIZON_COLORS[(h - 1) % 8] + 'cc',
+                    pointBackgroundColor: HORIZON_COLORS[(h - 1) % 8] + 'cc',
+                });
+                DATA.test_dates.forEach((d, i) => chartRows.push({
+                    'Целевой квартал': qShort(d), 'Горизонт': h, 'Прогноз построен в': origins[i],
+                    'Факт г/г, %': round(fact[i]), 'Прогноз модели г/г, %': round(pred[i]),
+                    'Ошибка модели, п.п.': pred[i] != null && fact[i] != null ? round(pred[i] - fact[i]) : null,
+                }));
+            }
+            return { labels, datasets, forecastStart: -1, unit: 'темп роста г/г, %' };
+        }
+
         function renderChart(cfg) {
             const ctx = document.getElementById('mainChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
@@ -1622,6 +1677,8 @@
                                         const lo = context.chart.data.datasets[context.datasetIndex - 1].data[context.dataIndex];
                                         return `${context.dataset.label}: ${fmt(lo, 2)} … ${fmt(value, 2)}`;
                                     }
+                                    if (context.dataset.origins)
+                                        return `h = ${context.dataset.horizon} · построен в ${context.dataset.origins[context.dataIndex]}: ${value.toFixed(2)}`;
                                     return `${context.dataset.label}: ${value.toFixed(2)}`;
                                 }
                             }
@@ -1672,10 +1729,10 @@
                 ...(path || []).map(r => ({ ...r, type: 'прогноз' })),
             ];
             const showBand = path && path.some(r => r.yoyLo != null);
-            document.getElementById('tableHead').innerHTML = `<tr><th>Период</th><th>Уровень, трлн ₽</th><th>Темп роста г/г, %</th>
+            document.getElementById('tableHead').innerHTML = `<tr><th>Период</th><th>Уровень, трлн ₽ <span class="price-base">(цены 2021 г.)</span></th><th>Темп роста г/г, %</th>
                 ${showBand ? `<th>Среднее топ-${DATA.meta.top_k}, %</th><th>Диапазон 25–75%, %</th>` : ''}
 <th>Тип</th></tr>`;
-            document.getElementById('tableBody').innerHTML = tableRows.slice().reverse().map(r => {
+            document.getElementById('tableBody').innerHTML = tableRows.map(r => {
                 const badge = r.type === 'прогноз' ? '<span class="forecast-badge">прогноз</span>' : '<span class="actual-badge">факт</span>';
                 return `<tr>
                     <td>${qLong(r.date)}</td>
@@ -1721,41 +1778,50 @@
             return rows.filter(r => !r.isFact || r === lastFull);
         }
 
-        // ─── Bank of Russia medium-term forecasts (DATA.cbr, newest first, up to 3) ──────────
+        // ─── Official forecasts: Bank of Russia (DATA.cbr, newest first) and the Ministry of
+        // Economic Development (DATA.minek, same format, filled by hand) — only the latest of each
         function cbrDate(iso) { return `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}`; }
-        function cbrCell(forecast, year, growth) {
-            const v = ((forecast.values || {})[state.target] || {})[String(year)];
+        function cbrCell(forecast, year, growth, who = 'ЦБ') {
+            const v = forecast && ((forecast.values || {})[state.target] || {})[String(year)];
             if (!v) return '<td class="cbr muted">—</td>';
             const [lo, hi, isFact] = v;
             const text = lo === hi ? signed(lo) : `${fmt(lo)} … ${fmt(hi)}`;
-            if (isFact) return `<td class="cbr muted" title="факт / оценка ЦБ">${text} <span class="mark">факт</span></td>`;
+            if (isFact) return `<td class="cbr muted" title="факт / оценка (${who})">${text} <span class="mark">факт</span></td>`;
             const g = round(growth, 1);
             const mark = g == null ? '' : (g >= lo && g <= hi
-                ? '<span class="mark in" title="наш прогноз внутри диапазона ЦБ">✓</span>'
-                : `<span class="mark out" title="наш прогноз ${g < lo ? 'ниже' : 'выше'} диапазона ЦБ">${g < lo ? '▼' : '▲'}</span>`);
+                ? `<span class="mark in" title="наш прогноз внутри диапазона (${who})">✓</span>`
+                : `<span class="mark out" title="наш прогноз ${g < lo ? 'ниже' : 'выше'} диапазона (${who})">${g < lo ? '▼' : '▲'}</span>`);
             return `<td class="cbr">${text}${mark}</td>`;
+        }
+        function officialHead(f, name, title) {
+            if (!f) return `<th title="${title}">${name}</th>`;
+            const label = `${name} ${cbrDate(f.date)}`;
+            return `<th title="${title}">${f.url ? `<a href="${f.url}" target="_blank" rel="noopener">${label}</a>` : label}</th>`;
         }
 
         function updateAnnual(path) {
             const rows = annualEstimates(path);
             const isConsensus = state.model === 'consensus';
             const showBand = isConsensus && rows.some(r => r.lo != null);
-            const cbr = (DATA.cbr || []).slice(0, 3);
+            const cbr = (DATA.cbr || [])[0] || null;
+            const minek = (DATA.minek || [])[0] || null;
             document.getElementById('annualHead').innerHTML = `<tr><th>Год</th><th>Темп роста, %</th>
                 ${showBand ? `<th>Среднее топ-${DATA.meta.top_k}, %</th><th>Диапазон 25–75%, %</th>` : ''}
-                ${cbr.map(f => `<th title="Среднесрочный прогноз Банка России, базовый сценарий"><a href="${f.url}" target="_blank" rel="noopener">ЦБ ${cbrDate(f.date)}</a></th>`).join('')}
+                ${officialHead(cbr, 'Прогноз ЦБ', 'Среднесрочный прогноз Банка России, базовый сценарий')}
+                ${officialHead(minek, 'Прогноз Минэка', 'Прогноз социально-экономического развития Минэкономразвития России, базовый вариант')}
                 <th>Кварталы: факт</th><th>Кварталы: прогноз</th></tr>`;
             document.getElementById('annualBody').innerHTML = rows.map(r => `<tr>
                     <td><strong>${r.year}</strong></td>
                     <td class="num ${r.growth >= 0 ? 'positive' : 'negative'}">${signed(r.growth)}</td>
                     ${showBand ? `<td>${r.mean == null ? '—' : signed(r.mean)}</td><td>${r.lo == null ? '—' : `${fmt(r.lo)} … ${fmt(r.hi)}`}</td>` : ''}
-                    ${cbr.map(f => cbrCell(f, r.year, r.isFact ? null : r.growth)).join('')}
+                    ${cbrCell(cbr, r.year, r.isFact ? null : r.growth, 'ЦБ')}
+                    ${cbrCell(minek, r.year, r.isFact ? null : r.growth, 'Минэк')}
                     <td class="muted">${r.factQ || '—'}</td>
                     <td class="muted">${r.fcQ ? r.fcQ + ' кв.' : '— (факт)'}</td>
                 </tr>`).join('');
-            const cbrNote = cbr.length
-                ? ` ЦБ — диапазон среднесрочного прогноза Банка России (базовый сценарий, прирост к предыдущему году, %) из ${cbr.length} последних публикаций; ✓ — наш прогноз внутри диапазона, ▲/▼ — выше/ниже.`
-                : '';
+            const cbrNote = ' Прогноз ЦБ — диапазон последнего среднесрочного прогноза Банка России (базовый сценарий), '
+                + 'прогноз Минэка — последний прогноз Минэкономразвития (базовый вариант); прирост к предыдущему году, %. '
+                + '✓ — наш прогноз внутри диапазона, ▲/▼ — выше/ниже.';
             document.getElementById('annualFoot').textContent = (showBand
                 ? `Темп роста консенсуса — по медиане ${DATA.meta.top_k} лучших спецификаций в каждом квартале; среднее — по их среднему. `
                   + `Диапазон 25–75% — если бы все прогнозные кварталы года оказались на нижней (верхней) границе квартального диапазона 25–75% прогнозов ${DATA.meta.top_k} лучших спецификаций.`
@@ -1816,7 +1882,8 @@
             const titles = {
                 level: 'факт + прогноз на 2 года, уровни',
                 yoy: 'факт + прогноз на 2 года, темп роста к тому же кварталу прошлого года',
-                test: `ретроспектива, горизонт h = ${state.horizon}: прогнозы за ${state.horizon} кв. до целевого квартала (горизонт меняется кнопками ниже)`,
+                test: `ретроспектива по горизонтам, h = ${state.horizon}: прогнозы за ${state.horizon} кв. до целевого квартала (горизонт меняется кнопками ниже)`,
+                points: `ретроспектива по тестовым точкам: для каждого квартала — прогнозы модели на всех горизонтах h = 1…${DATA.meta.horizon}`,
             };
             document.getElementById('chartTitle').innerHTML = `${t.name} <span>${titles[state.view]}</span>`;
             document.querySelectorAll('#horizonSeg button').forEach(b => b.classList.toggle('active', +b.dataset.h === state.horizon));
@@ -1824,7 +1891,8 @@
             document.getElementById('horizonHint').textContent = h0 === 1
                 ? 'h = 1 — наукаст: прогноз текущего квартала'
                 : `h = ${h0} — прогноз сделан за ${h0} кв. до целевого квартала (на ${h0} кв. вперёд от последнего известного факта)`;
-            const cfg = state.view === 'test' ? buildTestChart(spec, compares) : buildSeriesChart(spec, path, compares);
+            const cfg = state.view === 'test' ? buildTestChart(spec, compares)
+                : state.view === 'points' ? buildPointsChart(spec) : buildSeriesChart(spec, path, compares);
             renderChart(cfg);
 
             let note;
@@ -1836,6 +1904,12 @@
                      + `Синяя линия — фактический темп роста, серая — наивный прогноз (последний известный темп роста). `
                      + `Чем ближе оранжевая линия к синей и чем дальше серая, тем полезнее модель. Другой горизонт — кнопки «h = …» над графиком или строка таблицы справа. `
                      + `Факт и прогнозы на всех горизонтах — кнопка «📊 Excel».`;
+            } else if (state.view === 'points') {
+                note = `Как читать: синяя линия — фактический темп роста. Над каждым кварталом ретроспективы — ${DATA.meta.horizon} точек: `
+                     + `прогнозы модели «${MODELS[state.model].name}» для этого квартала, построенные в разные моменты. Цвет и форма маркера — горизонт: `
+                     + `h = 1 — наукаст, построен в самом квартале, h = ${DATA.meta.horizon} — построен за ${DATA.meta.horizon - 1} кв. до него. `
+                     + `Наведите на квартал, чтобы увидеть горизонт и квартал построения каждого прогноза. Обычно точки сходятся к факту по мере уменьшения горизонта. `
+                     + `Здесь показывается только одна модель, без наивного прогноза и сравнения.`;
             } else {
                 note = `Прогноз от ${qLong(DATA.meta.origin)} — первого квартала без опубликованного значения. `;
                 if (state.model === 'consensus') note += `Консенсус — медиана ${DATA.meta.top_k} спецификаций с наименьшей ошибкой на ретроспективе; закрашено — диапазон 25–75% их прогнозов (средняя половина, без крайних оценок), а не вероятностный интервал. Наведите на строку горизонта справа, чтобы увидеть состав.`;
@@ -1905,13 +1979,16 @@
             level: 'уровни: факт и прогноз на 2 года',
             yoy: 'темпы роста г/г: факт и прогноз на 2 года',
             test: 'ретроспектива: факт и исторические прогнозы на всех горизонтах h = 1…8',
+            points: 'ретроспектива по тестовым точкам: факт и прогнозы на всех горизонтах h = 1…8',
         };
         function exportExcel() {
             if (typeof XLSX === 'undefined') { showToast('Excel недоступен: библиотека не загрузилась'); return; }
             const wb = XLSX.utils.book_new();
             const add = (rows, name) => { if (rows.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), name); };
             const spec = getSpec(state.model);
-            if (state.view === 'test') {
+            if (state.view === 'points') {
+                add(chartRows, 'По тестовым точкам');
+            } else if (state.view === 'test') {
                 add(retroRows(), 'Ретро факт и прогноз');
                 add(horizonStats(spec).map(s => ({
                     'Горизонт': s.h, 'MAE модели, п.п.': round(s.err), 'MAE наивного, п.п.': round(s.naive),
@@ -1920,7 +1997,7 @@
             } else {
                 add(chartRows, state.view === 'level' ? 'Уровни' : 'Темпы роста');
             }
-            const names = { level: 'levels', yoy: 'yoy', test: 'retro' };
+            const names = { level: 'levels', yoy: 'yoy', test: 'retro', points: 'retro_points' };
             XLSX.writeFile(wb, `${names[state.view]}_${state.target}_${state.model}_a${state.avail}_${DATA.meta.run_id}.xlsx`);
             showToast(`Excel скачан — ${EXPORT_TITLES[state.view]}`);
         }
