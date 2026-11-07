@@ -347,7 +347,7 @@ class DashboardStage:
             logger.warning("no Bank of Russia forecasts in S3, the dashboard is built without them")
             return []
         frame = pl.read_parquet(data).filter(pl.col("forecast_date") <= date.fromisoformat(self.ctx.run_date))
-        return dashboard_payload(frame)
+        return dashboard_payload(frame, n=1)  # the dashboard shows only the latest CBR forecast
 
 
 # --------------------------------------------------------------------- seed
