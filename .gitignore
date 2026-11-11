@@ -44,3 +44,5 @@ deepgbm_env/
 
 # secrets of the service (S3 keys, Airflow password)
 .env
+
+build.log
