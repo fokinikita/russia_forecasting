@@ -6,7 +6,7 @@
 [Фокин Н.Д. Модели для наукастинга и прогнозирования компонент ВВП по использованию в реальном времени. Вопросы экономики. 2026;(9):116-143.](https://www.vopreco.ru/jour/article/view/5885)
 
 <p align="center">
-  <a href="https://fokinikita.github.io/russia_forecasting/">
+  <a href="https://fokinikita.github.io/russia_forecasting/dashboard/macro_dashboard_2026-11-09.html">
     <img src="https://img.shields.io/badge/%F0%9F%93%8A%20%D0%9E%D0%A2%D0%9A%D0%A0%D0%AB%D0%A2%D0%AC%20%D0%98%D0%9D%D0%A2%D0%95%D0%A0%D0%90%D0%9A%D0%A2%D0%98%D0%92%D0%9D%D0%AB%D0%99%20%D0%94%D0%90%D0%A8%D0%91%D0%9E%D0%A0%D0%94-4f46e5?style=for-the-badge" alt="Открыть интерактивный дашборд">
   </a>
 </p>
@@ -17,11 +17,12 @@
 
 ## 📊 Дашборд
 
-> Это пример одного из прогонов (расчёт от 23.10.2026): данные статичные и автоматически не обновляются,
+> Это пример одного из прогонов (расчёт от 09.11.2026): данные статичные и автоматически не обновляются,
 > актуальные дашборды еженедельный сервис сохраняет в S3 (см. раздел про Airflow ниже).
-> Живой HTML-дашборд со всеми настройками: **https://fokinikita.github.io/russia_forecasting/**
+> Живой HTML-дашборд со всеми настройками: **https://fokinikita.github.io/russia_forecasting/dashboard/macro_dashboard_2026-11-09.html**
+> (файл: [`dashboard/macro_dashboard_2026-11-09.html`](dashboard/macro_dashboard_2026-11-09.html))
 
-> Ветка `main_auto_pipeline`. Исходный эксперимент на excel-таблицах с данными портала
+> Ветка `autopipeline_v2`. Исходный эксперимент на excel-таблицах с данными портала
 > [data.iep.ru](https://data.iep.ru/) (`main.py`, `models/`, `preds/`, `mfbvar.R`) остался в ветке `main`.
 
 ## Прогнозируемые показатели (в постоянных ценах 2021 г., темп роста г/г)
