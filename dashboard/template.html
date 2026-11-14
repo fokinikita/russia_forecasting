@@ -1163,7 +1163,8 @@
         function qLong(iso) { return `${ROMAN[quarterOf(iso)]} кв. ${iso.slice(0, 4)}`; }
         function pct(logGrowth) { return logGrowth == null ? null : (Math.exp(logGrowth) - 1) * 100; }
         function fmt(v, d = 1) { return v == null || isNaN(v) ? '—' : v.toFixed(d); }
-        function signed(v, d = 1) { return v == null || isNaN(v) ? '—' : `${v >= 0 ? '+' : ''}${v.toFixed(d)}`; }
+        // no "+" for positive numbers, only "−" for negative ones (and never "-0.0")
+        function signed(v, d = 1) { return v == null || isNaN(v) ? '—' : (Math.abs(v) < 0.5 * 10 ** -d ? 0 : v).toFixed(d); }
         function round(v, d = 3) { return v == null || isNaN(v) ? null : +v.toFixed(d); }
         function quantile(sorted, q) {
             const v = sorted.filter(x => x != null).sort((a, b) => a - b);
@@ -1812,7 +1813,11 @@
                 ${officialHead(cbr, 'Прогноз ЦБ', 'Среднесрочный прогноз Банка России, базовый сценарий')}
                 ${officialHead(minek, 'Прогноз Минэка', 'Прогноз социально-экономического развития Минэкономразвития России, базовый вариант')}
                 <th>Кварталы: факт</th><th>Кварталы: прогноз</th></tr>`;
-            document.getElementById('annualBody').innerHTML = rows.map(r => `<tr>
+            const nCols = 6 + (showBand ? 2 : 0);
+            document.getElementById('annualBody').innerHTML = rows.map(r => r.isFact ? `<tr>
+                    <td><strong>${r.year}</strong></td>
+                    <td class="num ${r.growth >= 0 ? 'positive' : 'negative'}" colspan="${nCols - 1}">${signed(r.growth)} <span class="muted">— факт</span></td>
+                </tr>` : `<tr>
                     <td><strong>${r.year}</strong></td>
                     <td class="num ${r.growth >= 0 ? 'positive' : 'negative'}">${signed(r.growth)}</td>
                     ${showBand ? `<td>${r.mean == null ? '—' : signed(r.mean)}</td><td>${r.lo == null ? '—' : `${fmt(r.lo)} … ${fmt(r.hi)}`}</td>` : ''}
@@ -1822,7 +1827,7 @@
                     <td class="muted">${r.fcQ ? r.fcQ + ' кв.' : '— (факт)'}</td>
                 </tr>`).join('');
             const cbrNote = ' Прогноз ЦБ — диапазон последнего среднесрочного прогноза Банка России (базовый сценарий), '
-                + 'прогноз Минэка — последний прогноз Минэкономразвития (базовый вариант; для ВВП на 2027 г. — диапазон от консервативного 0,7% до базового 1,4% сценария); прирост к предыдущему году, %. '
+                + 'прогноз Минэка — последний прогноз Минэкономразвития (базовый вариант; диапазон — разброс между сценариями, пояснение под значением); прирост к предыдущему году, %. '
                 + '✓ — наш прогноз внутри диапазона, ▲/▼ — выше/ниже.';
             document.getElementById('annualFoot').textContent = (showBand
                 ? `Темп роста консенсуса — по медиане ${DATA.meta.top_k} лучших спецификаций в каждом квартале; среднее — по их среднему. `
