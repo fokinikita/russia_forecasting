@@ -929,6 +929,7 @@
         .annual-box td.cbr .mark {font-size:11px;margin-left:4px;}
         .annual-box td.cbr .in {color:#059669;}
         .annual-box td.cbr .out {color:#d97706;}
+        .annual-box td.cbr .note {font-size:11px;color:#6b7280;white-space:normal;margin-top:2px;}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -1791,10 +1792,11 @@
             const mark = g == null ? '' : (g >= lo && g <= hi
                 ? `<span class="mark in" title="наш прогноз внутри диапазона (${who})">✓</span>`
                 : `<span class="mark out" title="наш прогноз ${g < lo ? 'ниже' : 'выше'} диапазона (${who})">${g < lo ? '▼' : '▲'}</span>`);
-            return `<td class="cbr">${text}${mark}</td>`;
+            const note = (((forecast.notes || {})[state.target] || {})[String(year)]);
+            return `<td class="cbr">${text}${mark}${note ? `<div class="note">${note}</div>` : ''}</td>`;
         }
         function officialHead(f, name, title) {
-            if (!f) return `<th title="${title}">${name}</th>`;
+            if (!f || !f.date) return `<th title="${title}">${f && f.url ? `<a href="${f.url}" target="_blank" rel="noopener">${name}</a>` : name}</th>`;
             const label = `${name} ${cbrDate(f.date)}`;
             return `<th title="${title}">${f.url ? `<a href="${f.url}" target="_blank" rel="noopener">${label}</a>` : label}</th>`;
         }
@@ -1820,7 +1822,7 @@
                     <td class="muted">${r.fcQ ? r.fcQ + ' кв.' : '— (факт)'}</td>
                 </tr>`).join('');
             const cbrNote = ' Прогноз ЦБ — диапазон последнего среднесрочного прогноза Банка России (базовый сценарий), '
-                + 'прогноз Минэка — последний прогноз Минэкономразвития (базовый вариант); прирост к предыдущему году, %. '
+                + 'прогноз Минэка — последний прогноз Минэкономразвития (базовый вариант; для ВВП на 2027 г. — диапазон от консервативного 0,7% до базового 1,4% сценария); прирост к предыдущему году, %. '
                 + '✓ — наш прогноз внутри диапазона, ▲/▼ — выше/ниже.';
             document.getElementById('annualFoot').textContent = (showBand
                 ? `Темп роста консенсуса — по медиане ${DATA.meta.top_k} лучших спецификаций в каждом квартале; среднее — по их среднему. `
